@@ -1,6 +1,6 @@
 // export type SwfCompression = 'FWS' | 'CWS' | 'ZWS';
 
-export enum SwfCompression {
+export enum SwfSignature {
   None = 'FWS',
   Zlib = 'CWS',
   Lzma = 'ZWS',
@@ -12,7 +12,7 @@ export enum TagCode {
 }
 
 export interface IHeader {
-  signature: SwfCompression;
+  signature: SwfSignature;
   version: number;
   fileLength: number;
   frameSize: IRect;
