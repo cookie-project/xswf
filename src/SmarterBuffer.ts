@@ -1,9 +1,9 @@
 import { SmartBuffer, SmartBufferOptions } from 'smart-buffer';
 import { IRect } from './Types';
 
-export default class CustomBuffer extends SmartBuffer {
+export default class SmarterBuffer extends SmartBuffer {
 
-  public static fromBuffer(buff: Buffer, encoding?: BufferEncoding): CustomBuffer {
+  public static fromBuffer(buff: Buffer, encoding?: BufferEncoding): SmarterBuffer {
     return new this({ buff, encoding });
   }
 

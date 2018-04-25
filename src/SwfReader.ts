@@ -1,13 +1,13 @@
 import { readFileSync } from 'fs';
-import CustomBuffer from './CustomBuffer';
+import SmarterBuffer from './SmarterBuffer';
 import { IHeader, SwfCompression } from './Types';
 
 export default class SwfReader {
-  private buffer: CustomBuffer;
+  private buffer: SmarterBuffer;
 
   constructor(path: string) {
     const buffer = readFileSync(path);
-    this.buffer = CustomBuffer.fromBuffer(buffer);
+    this.buffer = SmarterBuffer.fromBuffer(buffer);
   }
 
   public getHeader(): IHeader {
