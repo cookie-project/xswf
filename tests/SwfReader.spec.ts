@@ -54,7 +54,7 @@ describe('SwfReader - Header', () => {
   });
 
   it('should read the frameRate', () => {
-    expect(file.header.frameRate).equals(12800);
+    expect(file.header.frameRate).equals(50.0);
   });
 
   it('should read the frameCount', () => {

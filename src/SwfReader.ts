@@ -37,10 +37,9 @@ export default class SwfReader {
     );
 
     const frameSize = this.buffer.readRect();
-    const frameRate = this.buffer.readUInt16LE();
+    const frameRate = this.buffer.readFixed(16);
     const frameCount = this.buffer.readUInt16LE();
-    const header: IHeader = { signature, version, fileLength, frameSize, frameRate, frameCount };
-    return header;
+    return { signature, version, fileLength, frameSize, frameRate, frameCount };
   }
 
   private getTags(): Tag[] {

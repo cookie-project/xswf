@@ -23,6 +23,23 @@ export default class SmarterBuffer extends SmartBuffer {
     return { nBits, xMin, xMax, yMin, yMax };
   }
 
+  public readFixed(size: 16 | 32 = 32): number {
+    let before: number;
+    let after: number;
+
+    switch (size) {
+      case 16:
+        after = this.readUInt8();
+        before = this.readUInt8();
+        return before + (after / 256);
+      case 32:
+      default:
+        after = this.readUInt16LE();
+        before = this.readUInt16LE();
+        return before + (after / 65536);
+    }
+  }
+
   public readUBits(n: number): number {
     let r = 0;
     while (n > 0) {
