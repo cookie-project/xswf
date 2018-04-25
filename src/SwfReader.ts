@@ -3,7 +3,6 @@ import { inflateSync } from 'zlib';
 import SmarterBuffer from './SmarterBuffer';
 import { IHeader, SwfSignature } from './Types';
 
-
 /**
  * Spec: https://wwwimages2.adobe.com/content/dam/acom/en/devnet/pdf/swf-file-format-spec.pdf
  */
@@ -24,9 +23,9 @@ export default class SwfReader {
     const fileLength = this.buffer.readUInt32LE();
 
     this.buffer = SmarterBuffer.fromBuffer(
-      signature === SwfCompression.Zlib
+      signature === SwfSignature.Zlib
         ? inflateSync(this.buffer.readBuffer())
-        : this.buffer.readBuffer()
+        : this.buffer.readBuffer(),
     );
 
     const frameSize = this.buffer.readRect();

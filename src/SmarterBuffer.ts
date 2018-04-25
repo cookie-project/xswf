@@ -2,10 +2,13 @@ import { SmartBuffer, SmartBufferOptions } from 'smart-buffer';
 import { IRect } from './Types';
 
 export default class SmarterBuffer extends SmartBuffer {
-
   public static fromBuffer(buff: Buffer, encoding?: BufferEncoding): SmarterBuffer {
     return new this({ buff, encoding });
   }
+
+  private lastByteCache: number;
+  private lastByteCacheOffset: number;
+  private lastByteCacheBitOffset: number;
 
   constructor(options?: SmartBufferOptions) {
     super(options);
@@ -17,26 +20,21 @@ export default class SmarterBuffer extends SmartBuffer {
     const xMax: number = this.readBits(nBits);
     const yMin: number = this.readBits(nBits);
     const yMax: number = this.readBits(nBits);
-    console.log({ nBits, xMin, xMax, yMin, yMax })
     return { nBits, xMin, xMax, yMin, yMax };
   }
-
-
-  lastByteCache: number;
-  lastByteCacheOffset: number;
-  lastByteCacheBitOffset: number;
 
   public readUBits(n: number): number {
     let r = 0;
     while (n > 0) {
-      if (this.lastByteCache == null || this.lastByteCacheBitOffset === 8 || this.lastByteCacheOffset < this.readOffset - 1) {
+      if (this.lastByteCache == null || this.lastByteCacheBitOffset === 8 ||
+          this.lastByteCacheOffset < this.readOffset - 1) {
         this.lastByteCacheOffset = this.readOffset;
         this.lastByteCache = this.readUInt8();
         this.lastByteCacheBitOffset = 0;
       }
-      let bitsInCache = 8 - this.lastByteCacheBitOffset;
-      let x = Math.min(bitsInCache, n);
-      r = (r << x) | ((this.lastByteCache >> (bitsInCache- x)) & (Math.pow(2, x) - 1));
+      const bitsInCache = 8 - this.lastByteCacheBitOffset;
+      const x = Math.min(bitsInCache, n);
+      r = (r << x) | ((this.lastByteCache >> (bitsInCache - x)) & (Math.pow(2, x) - 1));
       this.lastByteCacheBitOffset += x;
       n -= x;
     }
@@ -45,9 +43,9 @@ export default class SmarterBuffer extends SmartBuffer {
 
   public readBits(n: number): number {
     let value = this.readUBits(n);
-    let sign = (value >> (n - 1)) & 0x1;
-	  if (sign === 1) {
-		  value = value | (0xffffffff << n)
+    const sign = (value >> (n - 1)) & 0x1;
+    if (sign === 1) {
+      value = value | (0xffffffff << n);
     }
     return value;
   }
