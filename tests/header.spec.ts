@@ -1,13 +1,14 @@
 import { expect } from 'chai';
 import 'mocha';
 
-import { getHeader } from '../src';
-import { IHeader, SwfCompression } from '../src/Types';
+import { SwfReader, Types } from '../src';
 
-let header: IHeader;
+let reader: SwfReader;
+let header: Types.IHeader;
 
 before((done) => {
-  header = getHeader('./tests/DofusInvoker.swf');
+  reader = new SwfReader('./tests/DofusInvoker.swf');
+  header = reader.getHeader();
   done();
 });
 
@@ -18,7 +19,7 @@ describe('Header tests', () => {
   });
 
   it('should read the signature', () => {
-    expect(header.signature).equals(SwfCompression.None);
+    expect(header.signature).equals(Types.SwfCompression.None);
   });
 
   it('should read the fileLength', () => {
