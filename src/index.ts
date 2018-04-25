@@ -1,24 +1,17 @@
 import { readFileSync } from 'fs';
-import { SmartBuffer, SmartBufferOptions } from 'smart-buffer';
-import { inflateSync } from 'zlib';
+import CustomBuffer from './CustomBuffer';
+import { IHeader, SwfCompression } from './Types';
 
-export interface ISwfHeader {
-  signature: string;
-  version: number;
-  fileLength: number;
-  fileData: Buffer;
-  fileBuffer: SmartBuffer;
-}
-
-export function getHeader(path: string): ISwfHeader {
+export function getHeader(path: string): IHeader {
   const data = readFileSync(path);
-  const buffer = SmartBuffer.fromBuffer(data);
-  const signature = String.fromCharCode(buffer.readUInt8(), buffer.readUInt8(), buffer.readUInt8());
+  const buffer = CustomBuffer.fromBuffer(data);
+  const signatureString = String.fromCharCode(buffer.readUInt8(), buffer.readUInt8(), buffer.readUInt8());
+  const signature: SwfCompression = signatureString as SwfCompression;
   const version = buffer.readUInt8();
   const fileLength = buffer.readUInt32LE();
-  const fileData = buffer.readBuffer(fileLength);
-  const isCompressed = signature[0] === 'C';
-  const fileBuffer = SmartBuffer.fromBuffer(isCompressed ? inflateSync(fileData) : fileData);
-  const header: ISwfHeader = { signature, version, fileLength, fileData, fileBuffer };
+  const frameSize = buffer.readRect();
+  const frameRate = buffer.readUInt16LE();
+  const frameCount = buffer.readUInt16LE();
+  const header: IHeader = { signature, version, fileLength, frameSize, frameRate, frameCount };
   return header;
 }
