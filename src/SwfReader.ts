@@ -37,7 +37,7 @@ export default class SwfReader {
     );
 
     const frameSize = this.buffer.readRect();
-    const frameRate = this.buffer.readUInt16LE();
+    const frameRate = this.buffer.readFixed(16);
     const frameCount = this.buffer.readUInt16LE();
     return { signature, version, fileLength, frameSize, frameRate, frameCount };
   }
