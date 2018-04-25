@@ -19,11 +19,11 @@ describe('Header tests', () => {
   });
 
   it('should read the signature', () => {
-    expect(header.signature).equals(Types.SwfCompression.None);
+    expect(header.signature).equals(Types.SwfCompression.Zlib);
   });
 
   it('should read the fileLength', () => {
-    expect(header.fileLength).equals(12098065);
+    expect(header.fileLength).equals(20634516);
   });
 
   it('should read the frameSize', () => {
@@ -35,11 +35,11 @@ describe('Header tests', () => {
   });
 
   it('should read the frameRate', () => {
-    expect(header.frameRate).equals(128);
+    expect(header.frameRate).equals(40056);
   });
 
   it('should read the frameCount', () => {
-    expect(header.frameCount).equals(8195);
+    expect(header.frameCount).equals(48356);
   });
 
 });
