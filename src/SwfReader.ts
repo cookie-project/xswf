@@ -3,6 +3,10 @@ import { inflateSync } from 'zlib';
 import SmarterBuffer from './SmarterBuffer';
 import { IHeader, SwfCompression } from './Types';
 
+
+/**
+ * Spec: https://wwwimages2.adobe.com/content/dam/acom/en/devnet/pdf/swf-file-format-spec.pdf
+ */
 export default class SwfReader {
   private buffer: SmarterBuffer;
 
