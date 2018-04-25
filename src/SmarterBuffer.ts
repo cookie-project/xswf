@@ -7,7 +7,7 @@ export default class SmarterBuffer extends SmartBuffer {
     return new this({ buff, encoding });
   }
 
-  constructor(options: SmartBufferOptions) {
+  constructor(options?: SmartBufferOptions) {
     super(options);
   }
 

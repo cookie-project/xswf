@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import 'mocha';
 
-import { SwfReader, Types } from '../src';
+import { SwfReader, Types } from '../../src';
 
 let reader: SwfReader;
 let header: Types.IHeader;
@@ -12,7 +12,7 @@ before((done) => {
   done();
 });
 
-describe('Header tests', () => {
+describe('SwfReader - Header', () => {
 
   it('should read the version', () => {
     expect(header.version).equals(11);
