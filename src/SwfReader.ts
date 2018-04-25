@@ -3,6 +3,8 @@ import { inflateSync } from 'zlib';
 import SmarterBuffer from './SmarterBuffer';
 import { IHeader, ISwf, SwfSignature, Tag, TagCode } from './Types';
 
+import AbcFileReader from './abcFile/AbcFileReader';
+
 /**
  * Spec: https://wwwimages2.adobe.com/content/dam/acom/en/devnet/pdf/swf-file-format-spec.pdf
  */
@@ -61,12 +63,20 @@ export default class SwfReader {
     }
     const data = this.buffer.readBuffer(length);
     switch (code) {
+      /**
+       * A partir de la page 18 de la spec
+       * https://wwwimages2.adobe.com/content/dam/acom/en/devnet/pdf/avm2overview.pdf
+       */
       case TagCode.DoABC:
-      return { code, length };
+        const dataBuffer = SmarterBuffer.fromBuffer(data);
+        dataBuffer.readUInt32LE();
+        dataBuffer.readStringNT();
+        const abcFileReader = new AbcFileReader(dataBuffer);
+        return { code, length, abcFile: abcFileReader.readFile() };
       case TagCode.End:
-      return { code, length };
+        return { code, length };
       default:
-      return { code, length, data };
+        return { code, length, data };
     }
   }
 

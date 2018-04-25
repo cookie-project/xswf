@@ -4,6 +4,7 @@
   ],
   "jsRules": {},
   "rules": {
+    "object-literal-sort-keys": [true, "match-declaration-order"],
     "no-bitwise": false,
     "indent": [
       true,

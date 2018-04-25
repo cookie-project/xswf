@@ -67,29 +67,28 @@ export default class SmarterBuffer extends SmartBuffer {
     return value;
   }
 
-/*   public readEncodedU32(pos: any): number {
-    let result: number = pos[0];
+  public readEncodedU32(): number {
+    let result: number = this.readInt8();
     if (!(result & 0x00000080)) {
-      pos++;
       return result;
     }
-    result = (result & 0x0000007f) | pos[1] << 7;
+    result = (result & 0x0000007f) | this.readInt8() << 7;
     if (!(result & 0x00004000)) {
-      pos += 2;
       return result;
     }
-    result = (result & 0x00003fff) | pos[2] << 14;
+    result = (result & 0x00003fff) | this.readInt8() << 14;
     if (!(result & 0x00200000)) {
-      pos += 3;
       return result;
     }
-    result = (result & 0x001fffff) | pos[3] << 21;
+    result = (result & 0x001fffff) | this.readInt8() << 21;
     if (!(result & 0x10000000)) {
-      pos += 4;
       return result;
     }
-    result = (result & 0x0fffffff) | pos[4] << 28;
-    pos += 5;
+    result = (result & 0x0fffffff) | this.readInt8() << 28;
     return result;
-  } */
+  }
+
+  public readEncodedU30(): number {
+    return this.readEncodedU32() & 0x3FFFFFFF;
+  }
 }

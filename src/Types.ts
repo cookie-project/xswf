@@ -1,3 +1,5 @@
+import { IAbcFile } from './abcFile/Types';
+
 // export type SwfCompression = 'FWS' | 'CWS' | 'ZWS';
 
 export enum SwfSignature {
@@ -90,6 +92,7 @@ export interface ITag {
 
 export interface ITagDoAbc extends ITag {
   code: TagCode.DoABC;
+  abcFile: IAbcFile;
 }
 
 export interface ITagEnd extends ITag {
