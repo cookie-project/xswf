@@ -1,0 +1,37 @@
+{
+  "name": "xswf",
+  "version": "0.0.1",
+  "description": "SWF utilities for NodeJS environment",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "mocha --reporter spec -r ts-node/register tests/**/*.spec.ts",
+    "build": "tsc",
+    "lint": "tslint --project . -t stylish",
+    "lint:fix": "tslint --project . -t stylish --fix",
+    "prepublishOnly": "npm run lint:fix && npm run test && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yovanoc/xswf.git"
+  },
+  "author": "Christopher Yovanovitch <yovano_c@outlook.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yovanoc/xswf/issues"
+  },
+  "homepage": "https://github.com/yovanoc/xswf#readme",
+  "devDependencies": {
+    "@types/chai": "^4.1.3",
+    "@types/mocha": "^5.2.0",
+    "@types/node": "^9.6.6",
+    "chai": "^4.1.2",
+    "mocha": "^5.1.1",
+    "ts-node": "^6.0.0",
+    "tslint": "^5.0.0-dev.0",
+    "typescript": "^2.9.0-dev.20180424"
+  },
+  "dependencies": {
+    "smart-buffer": "^4.0.1"
+  }
+}
