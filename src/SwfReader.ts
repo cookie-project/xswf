@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { inflateSync } from 'zlib';
 import SmarterBuffer from './SmarterBuffer';
-import { IHeader, ISwf, ITag, SwfSignature, TagCode } from './Types';
+import { IHeader, ISwf, SwfSignature, Tag, TagCode } from './Types';
 
 /**
  * Spec: https://wwwimages2.adobe.com/content/dam/acom/en/devnet/pdf/swf-file-format-spec.pdf
@@ -43,9 +43,9 @@ export default class SwfReader {
     return header;
   }
 
-  private getTags(): ITag[] {
-    const tags: ITag[] = [];
-    let tag: ITag;
+  private getTags(): Tag[] {
+    const tags: Tag[] = [];
+    let tag: Tag;
     do {
       tag = this.readTag();
       tags.push(tag);
@@ -53,15 +53,22 @@ export default class SwfReader {
     return tags;
   }
 
-  private readTag(): ITag {
+  private readTag(): Tag {
     const tagCodeAndLength = this.buffer.readUInt16LE();
-    const code = tagCodeAndLength >> 6;
+    const code: TagCode = tagCodeAndLength >> 6;
     let length = tagCodeAndLength & 63;
     if (length === 63) {
       length = this.buffer.readInt32LE();
     }
     const data = this.buffer.readBuffer(length);
-    return { code, length, data };
+    switch (code) {
+      case TagCode.DoABC:
+      return { code, length };
+      case TagCode.End:
+      return { code, length };
+      default:
+      return { code, length, data };
+    }
   }
 
   private readPath()  {

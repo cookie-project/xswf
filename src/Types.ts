@@ -86,8 +86,37 @@ export interface IHeader {
 export interface ITag {
   code: TagCode;
   length: number;
+}
+
+export interface ITagDoAbc extends ITag {
+  code: TagCode.DoABC;
+}
+
+export interface ITagEnd extends ITag {
+  code: TagCode.End;
+}
+
+export interface ITagOther extends ITag {
+  code: TagCode.ShowFrame  | TagCode.DefineShape  | TagCode.PlaceObject  | TagCode.RemoveObject
+  | TagCode.DefineBits  | TagCode.DefineButton  | TagCode.JPEGTables  | TagCode.SetBackgroundColor
+  | TagCode.DefineFont  | TagCode.DefineText  | TagCode.DoAction  | TagCode.DefineFontInfo  | TagCode.DefineSound
+  | TagCode.StartSound  | TagCode.DefineButtonSound  | TagCode.SoundStreamHead  | TagCode.SoundStreamBlock
+  | TagCode.DefineBitsLossless  | TagCode.DefineBitsJPEG2  | TagCode.DefineShape2  | TagCode.DefineButtonCxform
+  | TagCode.Protect  | TagCode.PlaceObject2  | TagCode.RemoveObject2  | TagCode.DefineShape3  | TagCode.DefineText2
+  | TagCode.DefineButton2  | TagCode.DefineBitsJPEG3  | TagCode.DefineBitsLossless2  | TagCode.DefineEditText
+  | TagCode.DefineSprite  | TagCode.ProductInfo  | TagCode.FrameLabel  | TagCode.SoundStreamHead2
+  | TagCode.DefineMorphShape  | TagCode.DefineFont2  | TagCode.ExportAssets  | TagCode.ImportAssets
+  | TagCode.EnableDebugger  | TagCode.DoInitAction  | TagCode.DefineVideoStream  | TagCode.VideoFrame
+  | TagCode.DefineFontInfo2  | TagCode.EnableDebugger2  | TagCode.ScriptLimits  | TagCode.SetTabIndex
+  | TagCode.FileAttributes  | TagCode.PlaceObject3  | TagCode.ImportAssets2  | TagCode.DefineFontAlignZones
+  | TagCode.CSMTextSettings  | TagCode.DefineFont3  | TagCode.SymbolClass  | TagCode.Metadata
+  | TagCode.DefineScalingGrid  | TagCode.DefineShape4  | TagCode.DefineMorphShape2
+  | TagCode.DefineSceneAndFrameLabelData  | TagCode.DefineBinaryData  | TagCode.DefineFontName
+  | TagCode.StartSound2  | TagCode.DefineBitsJPEG4  | TagCode.DefineFont4;
   data: Buffer;
 }
+
+export type Tag = ITagDoAbc | ITagEnd | ITagOther;
 
 export interface ISwf {
   header: IHeader;
