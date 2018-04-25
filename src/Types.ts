@@ -86,12 +86,6 @@ export interface IHeader {
 export interface ITag {
   code: TagCode;
   length: number;
-}
-
-export interface ITagDoABC {
-  tag: ITag;
-  flags: number;
-  name: string;
   data: Buffer;
 }
 
