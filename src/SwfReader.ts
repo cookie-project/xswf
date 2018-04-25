@@ -21,8 +21,8 @@ export default class SwfReader {
 
     this.buffer = SmarterBuffer.fromBuffer(
       signature === SwfCompression.Zlib
-        ? inflateSync(this.buffer.readBuffer(fileLength))
-        : this.buffer.readBuffer(fileLength)
+        ? inflateSync(this.buffer.readBuffer())
+        : this.buffer.readBuffer()
     );
 
     const frameSize = this.buffer.readRect();
