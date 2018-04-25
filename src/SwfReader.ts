@@ -1,4 +1,5 @@
 import { readFileSync } from 'fs';
+import { inflateSync } from 'zlib';
 import SmarterBuffer from './SmarterBuffer';
 import { IHeader, SwfCompression } from './Types';
 
@@ -17,6 +18,13 @@ export default class SwfReader {
     const signature: SwfCompression = signatureString as SwfCompression;
     const version = this.buffer.readUInt8();
     const fileLength = this.buffer.readUInt32LE();
+
+    this.buffer = SmarterBuffer.fromBuffer(
+      signature === SwfCompression.Zlib
+        ? inflateSync(this.buffer.readBuffer(fileLength))
+        : this.buffer.readBuffer(fileLength)
+    );
+
     const frameSize = this.buffer.readRect();
     const frameRate = this.buffer.readUInt16LE();
     const frameCount = this.buffer.readUInt16LE();
