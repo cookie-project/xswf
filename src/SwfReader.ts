@@ -1,9 +1,8 @@
 import { readFileSync } from 'fs';
 import { inflateSync } from 'zlib';
+import AbcFileReader from './abcFile/AbcFileReader';
 import SmarterBuffer from './SmarterBuffer';
 import { IHeader, ISwf, SwfSignature, Tag, TagCode } from './Types';
-
-import AbcFileReader from './abcFile/AbcFileReader';
 
 /**
  * Spec: https://wwwimages2.adobe.com/content/dam/acom/en/devnet/pdf/swf-file-format-spec.pdf

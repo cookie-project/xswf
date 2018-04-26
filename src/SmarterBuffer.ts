@@ -31,13 +31,15 @@ export default class SmarterBuffer extends SmartBuffer {
       case 16:
         after = this.readUInt8();
         before = this.readUInt8();
-        return before + (after / 256);
+        break;
       case 32:
       default:
         after = this.readUInt16LE();
         before = this.readUInt16LE();
-        return before + (after / 65536);
+        break;
     }
+
+    return before + (after / Math.pow(2, size / 2));
   }
 
   public readUBits(n: number): number {

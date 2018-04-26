@@ -1,7 +1,5 @@
 import { IAbcFile } from './abcFile/Types';
 
-// export type SwfCompression = 'FWS' | 'CWS' | 'ZWS';
-
 export enum SwfSignature {
   None = 'FWS',
   Zlib = 'CWS',
@@ -123,7 +121,7 @@ export type Tag = ITagDoAbc | ITagEnd | ITagOther;
 
 export interface ISwf {
   header: IHeader;
-  tags: ITag[];
+  tags: Tag[];
 }
 
 export interface IRect {

@@ -46,14 +46,14 @@ export default class AbcFileReader {
     }
 
     const stringCount = this.buffer.readEncodedU30();
-    const strings = [''];
+    const strings = [];
     for (let i = 1; i < stringCount; i++) {
       const size = this.buffer.readEncodedU30();
       strings.push(this.buffer.readBuffer(size).toString('utf8'));
     }
 
     const namespaceCount = this.buffer.readEncodedU30();
-    const namespaces: INamespaceInfo[] = [null];
+    const namespaces: INamespaceInfo[] = [];
     for (let i = 1; i < namespaceCount; i++) {
       const kind: NamespaceKind = this.buffer.readInt8();
       const name = this.buffer.readEncodedU30();

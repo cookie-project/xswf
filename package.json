@@ -6,6 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "mocha --reporter spec -r ts-node/register tests/**/*.spec.ts",
+    "tinker": "ts-node tinker.ts",
     "build": "tsc",
     "lint": "tslint --project . -t stylish",
     "lint:fix": "tslint --project . -t stylish --fix",
