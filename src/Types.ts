@@ -90,6 +90,8 @@ export interface ITag {
 
 export interface ITagDoAbc extends ITag {
   code: TagCode.DoABC;
+  flags: number;
+  name: string;
   abcFile: IAbcFile;
 }
 

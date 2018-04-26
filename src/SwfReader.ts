@@ -68,10 +68,16 @@ export default class SwfReader {
        */
       case TagCode.DoABC:
         const dataBuffer = SmarterBuffer.fromBuffer(data);
-        dataBuffer.readUInt32LE();
-        dataBuffer.readStringNT();
+        const flags = dataBuffer.readUInt32LE();
+        const name = dataBuffer.readStringNT();
         const abcFileReader = new AbcFileReader(dataBuffer);
-        return { code, length, abcFile: abcFileReader.readFile() };
+        return {
+          code,
+          length,
+          name,
+          flags,
+          abcFile: abcFileReader.readFile(),
+        };
       case TagCode.End:
         return { code, length };
       default:
