@@ -1,10 +1,10 @@
 import SmarterBuffer from './../SmarterBuffer';
 import {
-  ConstantOptionKind, IAbcFile, IConstantPool, IMetadataInfo,
-  IMethodInfo, IMultiname,
-  IMultinameInfo, IMultinameL, INamespaceInfo, INamespaceSetInfo, IOptionDetail, IOptionInfo,
-  IParamInfos, IQName, IRTQName, IRTQNameL, MethodInfoFlag, MultinameInfo, MultinameKind,
-  NamespaceKind,
+  ConstantOptionKind, IAbcFile, IConstantPool, IInstanceInfo,
+  IMetadataInfo, IMethodInfo,
+  IMultiname, IMultinameInfo, IMultinameL, INamespaceInfo, INamespaceSetInfo, InstanceInfoFlag,
+  IOptionDetail, IOptionInfo, IParamInfos, IQName, IRTQName, IRTQNameL, ITrait,
+  MethodInfoFlag, MultinameInfo, MultinameKind, NamespaceKind,
 } from './Types';
 
 /**
@@ -26,6 +26,8 @@ export default class AbcFileReader {
     const methods = this.readMethods(methodCount, constantPool);
     const metadataCount = this.buffer.readEncodedU30();
     const metadataInfo = this.readMetadataInfo(constantPool);
+    const classCount = this.buffer.readEncodedU30();
+    const instance = this.readInstanceInfo(constantPool, methods);
 
     return {
       minorVersion,
@@ -35,6 +37,8 @@ export default class AbcFileReader {
       methods,
       metadataCount,
       metadataInfo,
+      classCount,
+      instance,
     };
   }
 
@@ -131,11 +135,11 @@ export default class AbcFileReader {
           const nsSetIndex = this.buffer.readEncodedU30();
           const multiname: IMultiname = {
             kind,
-            get nsSet() {
-              return nsSet[nsSetIndex];
-            },
             get name() {
               return strings[name3];
+            },
+            get nsSet() {
+              return nsSet[nsSetIndex];
             },
           };
           multinames.push(multiname);
@@ -215,7 +219,6 @@ export default class AbcFileReader {
           const valIndex = this.buffer.readEncodedU30();
           const kind: ConstantOptionKind = this.buffer.readUInt8();
           options.push({
-            kind,
             get val() {
               switch (kind) {
                 case ConstantOptionKind.Int:
@@ -242,6 +245,7 @@ export default class AbcFileReader {
                   return null;
               }
             },
+            kind,
           });
         }
         method.options = { count, options };
@@ -280,6 +284,59 @@ export default class AbcFileReader {
       itemCount,
       keys,
       values,
+    };
+  }
+
+  private readInstanceInfo(constantPool: IConstantPool, methods: IMethodInfo[]): IInstanceInfo {
+    const nameIndex = this.buffer.readEncodedU30();
+    const supernameIndex = this.buffer.readEncodedU30();
+    const flags = this.buffer.readUInt8();
+
+    let protectedNs: INamespaceInfo;
+
+    if (flags & InstanceInfoFlag.ClassProtectedNs) {
+      protectedNs = constantPool.namespaces[this.buffer.readEncodedU30()];
+    }
+
+    const interfaceCount = this.buffer.readEncodedU30();
+    const interfaces: MultinameInfo[] = [];
+    for (let i = 0; i < interfaceCount; i++) {
+      interfaces.push(constantPool.multinames[this.buffer.readEncodedU30()]);
+    }
+
+    const iinitIndex = this.buffer.readEncodedU30();
+
+    const traitCount = this.buffer.readEncodedU30();
+    const traits: ITrait[] = [];
+    for (let i = 0; i < traitCount; i++) {
+      const nameIndex2 = this.buffer.readEncodedU30();
+      const kind = this.buffer.readUInt8();
+      /*
+      traits.push({
+        get name() {
+          return constantPool.multinames[nameIndex2];
+        },
+        kind,
+      });
+      */
+    }
+
+    return {
+      get name() {
+        return constantPool.multinames[nameIndex];
+      },
+      get supername() {
+        return constantPool.multinames[supernameIndex];
+      },
+      flags,
+      protectedNs,
+      interfaceCount,
+      interfaces,
+      get iinit() {
+        return methods[iinitIndex];
+      },
+      traitCount,
+      traits,
     };
   }
 }

@@ -33,4 +33,8 @@ const method = methods.filter((m) => m.name.indexOf('deserializeAs_') !== -1);
 
 const metadata = doAbc.abcFile.metadataInfo;
 
-log(metadata);
+// log(metadata);
+
+const instance = doAbc.abcFile.instance;
+
+log(instance.traitCount);
