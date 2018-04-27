@@ -15,6 +15,10 @@ export interface IConstantPool {
   strings: string[];
   namespaceCount: number;
   namespaces: INamespaceInfo[];
+  nsSetCount: number;
+  nsSet: INamespaceSetInfo[];
+  multinameCount: number;
+  multinames: MultinameInfo[];
 }
 
 export interface INamespaceInfo {
@@ -54,28 +58,28 @@ export interface IMultinameInfo {
   kind: MultinameKind;
 }
 
-export interface IQName {
+export interface IQName extends IMultinameInfo {
   kind: MultinameKind.QName | MultinameKind.QNameA;
   ns: INamespaceInfo;
   name: string;
 }
 
-export interface IRTQName {
+export interface IRTQName extends IMultinameInfo {
   kind: MultinameKind.RTQName | MultinameKind.RTQNameA;
   name: string;
 }
 
-export interface IRTQNameL {
-  kind: MultinameKind.RTQNAmeL | MultinameKind.RTQNAmeL;
+export interface IRTQNameL extends IMultinameInfo {
+  kind: MultinameKind.RTQNAmeL | MultinameKind.RTQNameLA;
 }
 
-export interface IMultiname {
+export interface IMultiname extends IMultinameInfo {
   kind: MultinameKind.Multiname | MultinameKind.MultinameA;
   name: string;
   nsSet: INamespaceSetInfo;
 }
 
-export interface IMultinameL {
+export interface IMultinameL extends IMultinameInfo {
   kind: MultinameKind.MultinameL | MultinameKind.MultinameLA;
   nsSet: INamespaceSetInfo;
 }

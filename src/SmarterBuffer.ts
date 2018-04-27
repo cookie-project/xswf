@@ -3,7 +3,7 @@ import { IRect } from './Types';
 
 export default class SmarterBuffer extends SmartBuffer {
   public static fromBuffer(buff: Buffer, encoding?: BufferEncoding): SmarterBuffer {
-    return new this({ buff, encoding });
+    return new this({ encoding, buff });
   }
 
   private lastByteCache: number;

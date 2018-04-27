@@ -72,11 +72,11 @@ export default class SwfReader {
         const name = dataBuffer.readStringNT();
         const abcFileReader = new AbcFileReader(dataBuffer);
         return {
+          abcFile: abcFileReader.readFile(),
           code,
+          flags,
           length,
           name,
-          flags,
-          abcFile: abcFileReader.readFile(),
         };
       case TagCode.End:
         return { code, length };
