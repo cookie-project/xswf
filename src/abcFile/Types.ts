@@ -4,6 +4,8 @@ export interface IAbcFile {
   constantPool: IConstantPool;
   methodCount: number;
   methods: IMethodInfo[];
+  metadataCount: number;
+  metadataInfo: IMetadataInfo;
 }
 
 export interface IConstantPool {
@@ -144,4 +146,11 @@ export interface IMethodInfo {
   flags: number;
   options?: IOptionInfo;
   paramNames?: IParamInfos;
+}
+
+export interface IMetadataInfo {
+  name: string;
+  itemCount: number;
+  keys: string[];
+  values: string[];
 }

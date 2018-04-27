@@ -1,9 +1,10 @@
 import SmarterBuffer from './../SmarterBuffer';
 import {
-  ConstantOptionKind, IAbcFile, IConstantPool, IMethodInfo,
-  IMultiname, IMultinameInfo,
-  IMultinameL, INamespaceInfo, INamespaceSetInfo, IOptionDetail, IOptionInfo, IParamInfos,
-  IQName, IRTQName, IRTQNameL, MethodInfoFlag, MultinameInfo, MultinameKind, NamespaceKind,
+  ConstantOptionKind, IAbcFile, IConstantPool, IMetadataInfo,
+  IMethodInfo, IMultiname,
+  IMultinameInfo, IMultinameL, INamespaceInfo, INamespaceSetInfo, IOptionDetail, IOptionInfo,
+  IParamInfos, IQName, IRTQName, IRTQNameL, MethodInfoFlag, MultinameInfo, MultinameKind,
+  NamespaceKind,
 } from './Types';
 
 /**
@@ -22,8 +23,9 @@ export default class AbcFileReader {
     const majorVersion = this.buffer.readUInt16LE();
     const constantPool = this.readConstantPool();
     const methodCount = this.buffer.readEncodedU30();
-
     const methods = this.readMethods(methodCount, constantPool);
+    const metadataCount = this.buffer.readEncodedU30();
+    const metadataInfo = this.readMetadataInfo(constantPool);
 
     return {
       minorVersion,
@@ -31,6 +33,8 @@ export default class AbcFileReader {
       constantPool,
       methodCount,
       methods,
+      metadataCount,
+      metadataInfo,
     };
   }
 
@@ -256,5 +260,26 @@ export default class AbcFileReader {
     }
 
     return methods;
+  }
+
+  private readMetadataInfo(constantPool: IConstantPool): IMetadataInfo {
+    const nameIndex = this.buffer.readEncodedU30();
+    const itemCount = this.buffer.readEncodedU30();
+    const keys: string[] = [];
+    for (let i = 0; i < itemCount; i++) {
+      keys.push(constantPool.strings[this.buffer.readEncodedU30()]);
+    }
+    const values: string[] = [];
+    for (let j = 0; j < itemCount; j++) {
+      values.push(constantPool.strings[this.buffer.readEncodedU30()]);
+    }
+    return {
+      get name() {
+        return constantPool.strings[nameIndex];
+      },
+      itemCount,
+      keys,
+      values,
+    };
   }
 }

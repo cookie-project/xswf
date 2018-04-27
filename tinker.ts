@@ -27,6 +27,10 @@ const qname = constantPool.multinames.find((m) => m && m.kind === AbcTypes.Multi
 
 const methods = doAbc.abcFile.methods;
 
-console.log(
-  JSON.stringify(methods.filter(method => method.name.indexOf('deserializeAs_') !== -1), null, 2)
-);
+const method = methods.filter((m) => m.name.indexOf('deserializeAs_') !== -1);
+
+// log(method[method.length - 1]);
+
+const metadata = doAbc.abcFile.metadataInfo;
+
+log(metadata);
