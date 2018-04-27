@@ -24,9 +24,9 @@ export default class AbcFileReader {
     const methodCount = this.buffer.readEncodedU30();
     const methods = this.readMethods(methodCount, constantPool);
     const metadataCount = this.buffer.readEncodedU30();
-    const metadataInfo = this.readMetadataInfo(constantPool);
+    const metadataInfos = this.readMetadataInfos(metadataCount, constantPool);
     const classCount = this.buffer.readEncodedU30();
-    const instance = this.readInstanceInfo(constantPool, methods);
+    const instances = this.readInstances(classCount, constantPool, methods);
 
     return {
       minorVersion,
@@ -35,9 +35,9 @@ export default class AbcFileReader {
       methodCount,
       methods,
       metadataCount,
-      metadataInfo,
+      metadataInfos,
       classCount,
-      instance,
+      instances,
     };
   }
 
@@ -265,77 +265,85 @@ export default class AbcFileReader {
     return methods;
   }
 
-  private readMetadataInfo(constantPool: IConstantPool): IMetadataInfo {
-    const nameIndex = this.buffer.readEncodedU30();
-    const itemCount = this.buffer.readEncodedU30();
-    const keys: string[] = [];
-    for (let i = 0; i < itemCount; i++) {
-      keys.push(constantPool.strings[this.buffer.readEncodedU30()]);
+  private readMetadataInfos(metadataCount: number, constantPool: IConstantPool): IMetadataInfo[] {
+    const metadatas: IMetadataInfo[] = [];
+    for (let i = 0; i < metadataCount; i++) {
+      const nameIndex = this.buffer.readEncodedU30();
+      const itemCount = this.buffer.readEncodedU30();
+      const keys: string[] = [];
+      for (let z = 0; z < itemCount; z++) {
+        keys.push(constantPool.strings[this.buffer.readEncodedU30()]);
+      }
+      const values: string[] = [];
+      for (let j = 0; j < itemCount; j++) {
+        values.push(constantPool.strings[this.buffer.readEncodedU30()]);
+      }
+      metadatas.push({
+        get name() {
+          return constantPool.strings[nameIndex];
+        },
+        itemCount,
+        keys,
+        values,
+      });
     }
-    const values: string[] = [];
-    for (let j = 0; j < itemCount; j++) {
-      values.push(constantPool.strings[this.buffer.readEncodedU30()]);
-    }
-    return {
-      get name() {
-        return constantPool.strings[nameIndex];
-      },
-      itemCount,
-      keys,
-      values,
-    };
+    return metadatas;
   }
 
-  private readInstanceInfo(constantPool: IConstantPool, methods: IMethodInfo[]): IInstanceInfo {
-    const nameIndex = this.buffer.readEncodedU30();
-    const supernameIndex = this.buffer.readEncodedU30();
-    const flags = this.buffer.readUInt8();
+  private readInstances(classCount: number, constantPool: IConstantPool, methods: IMethodInfo[]): IInstanceInfo[] {
+    const instances: IInstanceInfo[] = [];
+    for (let i = 0; i < classCount; i++) {
+      const nameIndex = this.buffer.readEncodedU30();
+      const supernameIndex = this.buffer.readEncodedU30();
+      const flags = this.buffer.readUInt8();
 
-    let protectedNs: INamespaceInfo;
+      let protectedNs: INamespaceInfo;
 
-    if (flags & InstanceInfoFlag.ClassProtectedNs) {
-      protectedNs = constantPool.namespaces[this.buffer.readEncodedU30()];
-    }
+      if (flags & InstanceInfoFlag.ClassProtectedNs) {
+        protectedNs = constantPool.namespaces[this.buffer.readEncodedU30()];
+      }
 
-    const interfaceCount = this.buffer.readEncodedU30();
-    const interfaces: MultinameInfo[] = [];
-    for (let i = 0; i < interfaceCount; i++) {
-      interfaces.push(constantPool.multinames[this.buffer.readEncodedU30()]);
-    }
+      const interfaceCount = this.buffer.readEncodedU30();
+      const interfaces: MultinameInfo[] = [];
+      for (let z = 0; z < interfaceCount; z++) {
+        interfaces.push(constantPool.multinames[this.buffer.readEncodedU30()]);
+      }
 
-    const iinitIndex = this.buffer.readEncodedU30();
+      const iinitIndex = this.buffer.readEncodedU30();
 
-    const traitCount = this.buffer.readEncodedU30();
-    const traits: ITrait[] = [];
-    for (let i = 0; i < traitCount; i++) {
-      const nameIndex2 = this.buffer.readEncodedU30();
-      const kind = this.buffer.readUInt8();
-      /*
-      traits.push({
+      const traitCount = this.buffer.readEncodedU30();
+      const traits: ITrait[] = [];
+      for (let x = 0; x < traitCount; x++) {
+        const nameIndex2 = this.buffer.readEncodedU30();
+        const kind = this.buffer.readUInt8();
+        /*
+        traits.push({
+          get name() {
+            return constantPool.multinames[nameIndex2];
+          },
+          kind,
+        });
+        */
+      }
+
+      instances.push({
         get name() {
-          return constantPool.multinames[nameIndex2];
+          return constantPool.multinames[nameIndex];
         },
-        kind,
+        get supername() {
+          return constantPool.multinames[supernameIndex];
+        },
+        flags,
+        protectedNs,
+        interfaceCount,
+        interfaces,
+        get iinit() {
+          return methods[iinitIndex];
+        },
+        traitCount,
+        traits,
       });
-      */
     }
-
-    return {
-      get name() {
-        return constantPool.multinames[nameIndex];
-      },
-      get supername() {
-        return constantPool.multinames[supernameIndex];
-      },
-      flags,
-      protectedNs,
-      interfaceCount,
-      interfaces,
-      get iinit() {
-        return methods[iinitIndex];
-      },
-      traitCount,
-      traits,
-    };
+    return instances;
   }
 }

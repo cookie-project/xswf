@@ -10,9 +10,9 @@ export interface IAbcFile {
   methodCount: number;
   methods: IMethodInfo[];
   metadataCount: number;
-  metadataInfo: IMetadataInfo;
+  metadataInfos: IMetadataInfo[];
   classCount: number;
-  instance: IInstanceInfo;
+  instances: IInstanceInfo[];
 }
 
 export interface IConstantPool {
