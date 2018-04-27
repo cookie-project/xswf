@@ -1,7 +1,7 @@
-import * as AbcTypes from './src/abcFile/Types';
 import SmarterBuffer from './src/SmarterBuffer';
 import SwfReader from './src/SwfReader';
 import * as Types from './src/Types';
+import { IQName, MultinameKind } from './src/abcFile/Types/multiname';
 
 function log(obj: any) {
   // tslint:disable-next-line:no-console
@@ -20,8 +20,8 @@ const doAbc = file.tags.find((tag) => tag.code === Types.TagCode.DoABC) as Types
 
 const constantPool = doAbc.abcFile.constantPool;
 
-const qname = constantPool.multinames.find((m) => m && m.kind === AbcTypes.MultinameKind.QName
-  && m.name.indexOf('deserializeAs') !== -1) as AbcTypes.IQName;
+const qname = constantPool.multinames.find((m) => m && m.kind === MultinameKind.QName
+  && m.name.indexOf('deserializeAs') !== -1) as IQName;
 
 // log(qname);
 
