@@ -22,6 +22,7 @@ export default class AbcFileReader {
     const majorVersion = this.buffer.readUInt16LE();
     const constantPool = this.readConstantPool();
     const methodCount = this.buffer.readEncodedU30();
+
     const methods = this.readMethods(methodCount, constantPool);
 
     return {
@@ -145,6 +146,14 @@ export default class AbcFileReader {
             },
           };
           multinames.push(multinamel);
+          break;
+        case MultinameKind.TypeName:
+          const nameIndex1 = this.buffer.readEncodedU30();
+          const paramsCount = this.buffer.readEncodedU30();
+          for (let j = 0; j < paramsCount; j++) {
+            this.buffer.readEncodedU30();
+          }
+          multinames.push(null);
           break;
         default:
           multinames.push(null);

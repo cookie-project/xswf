@@ -20,10 +20,13 @@ const doAbc = file.tags.find((tag) => tag.code === Types.TagCode.DoABC) as Types
 
 const constantPool = doAbc.abcFile.constantPool;
 
-const qname = constantPool.multinames.find((m) => m && m.kind === AbcTypes.MultinameKind.QName) as AbcTypes.IQName;
+const qname = constantPool.multinames.find((m) => m && m.kind === AbcTypes.MultinameKind.QName
+  && m.name.indexOf('deserializeAs') !== -1) as AbcTypes.IQName;
 
 // log(qname);
 
 const methods = doAbc.abcFile.methods;
 
-log(methods[3]);
+console.log(
+  JSON.stringify(methods.filter(method => method.name.indexOf('deserializeAs_') !== -1), null, 2)
+);

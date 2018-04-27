@@ -54,6 +54,7 @@ export enum MultinameKind {
   MultinameA = 0x0E,
   MultinameL = 0x1B,
   MultinameLA = 0x1C,
+  TypeName = 0x1D,
 }
 
 export interface IMultinameInfo {
@@ -86,7 +87,13 @@ export interface IMultinameL extends IMultinameInfo {
   nsSet: INamespaceSetInfo;
 }
 
-export type MultinameInfo = IQName | IRTQName | IRTQNameL | IMultiname | IMultinameL;
+export interface ITypeName extends IMultinameInfo {
+  kind: MultinameKind.TypeName;
+  name: number;
+  params: number[];
+}
+
+export type MultinameInfo = IQName | IRTQName | IRTQNameL | IMultiname | IMultinameL | ITypeName;
 
 export enum MethodInfoFlag {
   NeedArguments = 0x01,
