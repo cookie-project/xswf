@@ -1,0 +1,53 @@
+import { INamespaceInfo, INamespaceSetInfo } from './namespace';
+
+export enum MultinameKind {
+  QName = 0x07,
+  QNameA = 0x0D,
+  RTQName = 0x0F,
+  RTQNameA = 0x10,
+  RTQNAmeL = 0x11,
+  RTQNameLA = 0x12,
+  Multiname = 0x09,
+  MultinameA = 0x0E,
+  MultinameL = 0x1B,
+  MultinameLA = 0x1C,
+  TypeName = 0x1D,
+}
+
+export interface IMultinameInfo {
+  kind: MultinameKind;
+}
+
+export interface IQName extends IMultinameInfo {
+  kind: MultinameKind.QName | MultinameKind.QNameA;
+  ns: INamespaceInfo;
+  name: string;
+}
+
+export interface IRTQName extends IMultinameInfo {
+  kind: MultinameKind.RTQName | MultinameKind.RTQNameA;
+  name: string;
+}
+
+export interface IRTQNameL extends IMultinameInfo {
+  kind: MultinameKind.RTQNAmeL | MultinameKind.RTQNameLA;
+}
+
+export interface IMultiname extends IMultinameInfo {
+  kind: MultinameKind.Multiname | MultinameKind.MultinameA;
+  name: string;
+  nsSet: INamespaceSetInfo;
+}
+
+export interface IMultinameL extends IMultinameInfo {
+  kind: MultinameKind.MultinameL | MultinameKind.MultinameLA;
+  nsSet: INamespaceSetInfo;
+}
+
+export interface ITypeName extends IMultinameInfo {
+  kind: MultinameKind.TypeName;
+  name: number;
+  params: number[];
+}
+
+export type MultinameInfo = IQName | IRTQName | IRTQNameL | IMultiname | IMultinameL | ITypeName;

@@ -1,11 +1,10 @@
 import SmarterBuffer from './../SmarterBuffer';
-import {
-  ConstantOptionKind, IAbcFile, IConstantPool, IInstanceInfo,
-  IMetadataInfo, IMethodInfo,
-  IMultiname, IMultinameInfo, IMultinameL, INamespaceInfo, INamespaceSetInfo, InstanceInfoFlag,
-  IOptionDetail, IOptionInfo, IParamInfos, IQName, IRTQName, IRTQNameL, ITrait,
-  MethodInfoFlag, MultinameInfo, MultinameKind, NamespaceKind,
-} from './Types';
+import { IAbcFile, IConstantPool, IMetadataInfo } from './types';
+import { IInstanceInfo, InstanceInfoFlag } from './types/instance';
+import { ConstantOptionKind, IMethodInfo, IOptionDetail, MethodInfoFlag } from './types/methods';
+import { IMultiname, IMultinameL, IQName, IRTQName, IRTQNameL, MultinameInfo, MultinameKind } from './types/multiname';
+import { INamespaceInfo, INamespaceSetInfo, NamespaceKind } from './types/namespace';
+import { ITrait } from './types/trait';
 
 /**
  * Spec: https://wwwimages2.adobe.com/content/dam/acom/en/devnet/pdf/avm2overview.pdf
