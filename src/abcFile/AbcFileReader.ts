@@ -181,7 +181,7 @@ export default class AbcFileReader {
 
   private readMethods(methodCount: number, constantPool: IConstantPool): IMethodInfo[] {
     const methods: IMethodInfo[] = [];
-
+    let tmp = 0;
     for (let i = 0; i < methodCount; i++) {
       const paramCount = this.buffer.readEncodedU30();
       const returnTypeIndex = this.buffer.readEncodedU30();
@@ -189,6 +189,7 @@ export default class AbcFileReader {
       for (let y = 0; y < paramCount; y++) {
         paramTypes.push(constantPool.multinames[this.buffer.readEncodedU30()]);
       }
+
       const nameIndex = this.buffer.readEncodedU30();
       const flags = this.buffer.readUInt8();
 
@@ -244,6 +245,7 @@ export default class AbcFileReader {
       }
 
       if (flags & MethodInfoFlag.HasParamNames) {
+
         const names: string[] = [];
         for (let y = 0; y < paramCount; y++) {
           const index = this.buffer.readEncodedU30();
@@ -254,7 +256,7 @@ export default class AbcFileReader {
 
       methods.push(method);
     }
-
+console.log(methodCount, tmp);
     return methods;
   }
 }
