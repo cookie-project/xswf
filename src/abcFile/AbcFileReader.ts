@@ -1,8 +1,9 @@
 import SmarterBuffer from './../SmarterBuffer';
 import {
-  IAbcFile, IConstantPool, IMultiname, IMultinameL,
-  INamespaceInfo, INamespaceSetInfo,
-  IQName, IRTQName, IRTQNameL, MultinameInfo, MultinameKind, NamespaceKind,
+  ConstantOptionKind, IAbcFile, IConstantPool, IMethodInfo,
+  IMultiname, IMultinameInfo,
+  IMultinameL, INamespaceInfo, INamespaceSetInfo, IOptionDetail, IOptionInfo, IParamInfos,
+  IQName, IRTQName, IRTQNameL, MethodInfoFlag, MultinameInfo, MultinameKind, NamespaceKind,
 } from './Types';
 
 /**
@@ -19,13 +20,16 @@ export default class AbcFileReader {
   public readFile(): IAbcFile {
     const minorVersion = this.buffer.readUInt16LE();
     const majorVersion = this.buffer.readUInt16LE();
-
     const constantPool = this.readConstantPool();
+    const methodCount = this.buffer.readEncodedU30();
+    const methods = this.readMethods(methodCount, constantPool);
 
     return {
       minorVersion,
       majorVersion,
       constantPool,
+      methodCount,
+      methods,
     };
   }
 
@@ -164,5 +168,84 @@ export default class AbcFileReader {
       multinameCount,
       multinames,
     };
+  }
+
+  private readMethods(methodCount: number, constantPool: IConstantPool): IMethodInfo[] {
+    const methods: IMethodInfo[] = [];
+
+    for (let i = 0; i < methodCount; i++) {
+      const paramCount = this.buffer.readEncodedU30();
+      const returnTypeIndex = this.buffer.readEncodedU30();
+      const paramTypes: MultinameInfo[] = [];
+      for (let y = 0; y < paramCount; y++) {
+        paramTypes.push(constantPool.multinames[this.buffer.readEncodedU30()]);
+      }
+      const nameIndex = this.buffer.readEncodedU30();
+      const flags = this.buffer.readUInt8();
+
+      const method: IMethodInfo = {
+        paramCount,
+        get returnType() {
+          return constantPool.multinames[returnTypeIndex];
+        },
+        paramTypes,
+        get name() {
+          return constantPool.strings[nameIndex];
+        },
+        flags,
+      };
+
+      if (flags & MethodInfoFlag.HasOptional) {
+        const count = this.buffer.readEncodedU30();
+        const options: IOptionDetail[] = [];
+        for (let x = 0; x < count; x++) {
+          const valIndex = this.buffer.readEncodedU30();
+          const kind: ConstantOptionKind = this.buffer.readUInt8();
+          options.push({
+            kind,
+            get val() {
+              switch (kind) {
+                case ConstantOptionKind.Int:
+                  return constantPool.integers[valIndex];
+                case ConstantOptionKind.UInt:
+                  return constantPool.uintegers[valIndex];
+                case ConstantOptionKind.Double:
+                  return constantPool.doubles[valIndex];
+                case ConstantOptionKind.Utf8:
+                  return constantPool.strings[valIndex];
+                case ConstantOptionKind.PackageNamespace:
+                case ConstantOptionKind.Namespace:
+                case ConstantOptionKind.PackageInternalNs:
+                case ConstantOptionKind.ProtectedNamespace:
+                case ConstantOptionKind.ExplicitNamespace:
+                case ConstantOptionKind.StaticProtectedNs:
+                case ConstantOptionKind.PrivateNs:
+                  return constantPool.namespaces[valIndex];
+                case ConstantOptionKind.True:
+                case ConstantOptionKind.False:
+                case ConstantOptionKind.Null:
+                case ConstantOptionKind.Undefined:
+                default:
+                  return null;
+              }
+            },
+          });
+        }
+        method.options = { count, options };
+      }
+
+      if (flags & MethodInfoFlag.HasParamNames) {
+        const names: string[] = [];
+        for (let y = 0; y < paramCount; y++) {
+          const index = this.buffer.readEncodedU30();
+          names.push(constantPool.strings[index]);
+        }
+        method.paramNames = { names };
+      }
+
+      methods.push(method);
+    }
+
+    return methods;
   }
 }

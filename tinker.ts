@@ -20,6 +20,10 @@ const doAbc = file.tags.find((tag) => tag.code === Types.TagCode.DoABC) as Types
 
 const constantPool = doAbc.abcFile.constantPool;
 
-const qname = constantPool.multinames.find((m) => m.kind === AbcTypes.MultinameKind.QName) as AbcTypes.IQName;
+const qname = constantPool.multinames.find((m) => m && m.kind === AbcTypes.MultinameKind.QName) as AbcTypes.IQName;
 
-log(qname);
+// log(qname);
+
+const methods = doAbc.abcFile.methods;
+
+log(methods[3]);
