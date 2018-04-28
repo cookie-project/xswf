@@ -10,7 +10,7 @@ export enum MethodInfoFlag {
   HasParamNames = 0x80,
 }
 
-export enum ConstantOptionKind {
+export enum ConstantKind {
   Int = 0x03,
   UInt = 0x04,
   Double = 0x06,
@@ -30,7 +30,7 @@ export enum ConstantOptionKind {
 
 export interface IOptionDetail {
   val: number | string | INamespaceInfo;
-  kind: ConstantOptionKind;
+  kind: ConstantKind;
 }
 
 export interface IOptionInfo {

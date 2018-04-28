@@ -1,10 +1,10 @@
 import SmarterBuffer from './../SmarterBuffer';
 import { IAbcFile, IConstantPool, IMetadataInfo } from './types';
 import { IInstanceInfo, InstanceInfoFlag } from './types/instance';
-import { ConstantOptionKind, IMethodInfo, IOptionDetail, MethodInfoFlag } from './types/methods';
+import { ConstantKind, IMethodInfo, IOptionDetail, MethodInfoFlag } from './types/methods';
 import { IMultiname, IMultinameL, IQName, IRTQName, IRTQNameL, MultinameInfo, MultinameKind } from './types/multiname';
 import { INamespaceInfo, INamespaceSetInfo, NamespaceKind } from './types/namespace';
-import { ITrait } from './types/trait';
+import { ITrait, TraitType } from './types/trait';
 
 /**
  * Spec: https://wwwimages2.adobe.com/content/dam/acom/en/devnet/pdf/avm2overview.pdf
@@ -24,16 +24,9 @@ export default class AbcFileReader {
     const methodCount = this.buffer.readEncodedU30();
     const methods = this.readMethods(methodCount, constantPool);
     const metadataCount = this.buffer.readEncodedU30();
-    const metadata = [];
-    for (let i = 0; i < metadataCount; i++) {
-      metadata.push(this.readMetadataInfo(constantPool));
-    }
+    const metadataInfos = this.readMetadataInfos(metadataCount, constantPool);
     const classCount = this.buffer.readEncodedU30();
-    console.log(classCount);
-    const instances = [];
-    for (let i = 0; i < 1; i++) {
-      instances.push(this.readInstanceInfo(constantPool, methods));
-    }
+    const instances = this.readInstances(classCount, constantPool, methods);
 
     return {
       minorVersion,
@@ -42,7 +35,7 @@ export default class AbcFileReader {
       methodCount,
       methods,
       metadataCount,
-      metadata,
+      metadataInfos,
       classCount,
       instances,
     };
@@ -195,7 +188,6 @@ export default class AbcFileReader {
 
   private readMethods(methodCount: number, constantPool: IConstantPool): IMethodInfo[] {
     const methods: IMethodInfo[] = [];
-    let tmp = 0;
     for (let i = 0; i < methodCount; i++) {
       const paramCount = this.buffer.readEncodedU30();
       const returnTypeIndex = this.buffer.readEncodedU30();
@@ -224,30 +216,30 @@ export default class AbcFileReader {
         const options: IOptionDetail[] = [];
         for (let x = 0; x < count; x++) {
           const valIndex = this.buffer.readEncodedU30();
-          const kind: ConstantOptionKind = this.buffer.readUInt8();
+          const kind: ConstantKind = this.buffer.readUInt8();
           options.push({
             get val() {
               switch (kind) {
-                case ConstantOptionKind.Int:
+                case ConstantKind.Int:
                   return constantPool.integers[valIndex];
-                case ConstantOptionKind.UInt:
+                case ConstantKind.UInt:
                   return constantPool.uintegers[valIndex];
-                case ConstantOptionKind.Double:
+                case ConstantKind.Double:
                   return constantPool.doubles[valIndex];
-                case ConstantOptionKind.Utf8:
+                case ConstantKind.Utf8:
                   return constantPool.strings[valIndex];
-                case ConstantOptionKind.PackageNamespace:
-                case ConstantOptionKind.Namespace:
-                case ConstantOptionKind.PackageInternalNs:
-                case ConstantOptionKind.ProtectedNamespace:
-                case ConstantOptionKind.ExplicitNamespace:
-                case ConstantOptionKind.StaticProtectedNs:
-                case ConstantOptionKind.PrivateNs:
+                case ConstantKind.PackageNamespace:
+                case ConstantKind.Namespace:
+                case ConstantKind.PackageInternalNs:
+                case ConstantKind.ProtectedNamespace:
+                case ConstantKind.ExplicitNamespace:
+                case ConstantKind.StaticProtectedNs:
+                case ConstantKind.PrivateNs:
                   return constantPool.namespaces[valIndex];
-                case ConstantOptionKind.True:
-                case ConstantOptionKind.False:
-                case ConstantOptionKind.Null:
-                case ConstantOptionKind.Undefined:
+                case ConstantKind.True:
+                case ConstantKind.False:
+                case ConstantKind.Null:
+                case ConstantKind.Undefined:
                 default:
                   return null;
               }
@@ -274,77 +266,126 @@ export default class AbcFileReader {
     return methods;
   }
 
-  private readMetadataInfo(constantPool: IConstantPool): IMetadataInfo {
-    const nameIndex = this.buffer.readEncodedU30();
-    const itemCount = this.buffer.readEncodedU30();
-    const keys: string[] = [];
-    for (let i = 0; i < itemCount; i++) {
-      keys.push(constantPool.strings[this.buffer.readEncodedU30()]);
+  private readMetadataInfos(metadataCount: number, constantPool: IConstantPool): IMetadataInfo[] {
+    const metadatas: IMetadataInfo[] = [];
+    for (let i = 0; i < metadataCount; i++) {
+      const nameIndex = this.buffer.readEncodedU30();
+      const itemCount = this.buffer.readEncodedU30();
+      const keys: string[] = [];
+      for (let z = 0; z < itemCount; z++) {
+        keys.push(constantPool.strings[this.buffer.readEncodedU30()]);
+      }
+      const values: string[] = [];
+      for (let j = 0; j < itemCount; j++) {
+        values.push(constantPool.strings[this.buffer.readEncodedU30()]);
+      }
+      metadatas.push({
+        get name() {
+          return constantPool.strings[nameIndex];
+        },
+        itemCount,
+        keys,
+        values,
+      });
     }
-    const values: string[] = [];
-    for (let j = 0; j < itemCount; j++) {
-      values.push(constantPool.strings[this.buffer.readEncodedU30()]);
-    }
-    return {
-      get name() {
-        return constantPool.strings[nameIndex];
-      },
-      itemCount,
-      keys,
-      values,
-    };
+    return metadatas;
   }
 
-  private readInstanceInfo(constantPool: IConstantPool, methods: IMethodInfo[]): IInstanceInfo {
-    const nameIndex = this.buffer.readEncodedU30();
-    const supernameIndex = this.buffer.readEncodedU30();
-    const flags = this.buffer.readUInt8();
+  private readInstances(classCount: number, constantPool: IConstantPool, methods: IMethodInfo[]): IInstanceInfo[] {
+    const instances: IInstanceInfo[] = [];
+    for (let i = 0; i < classCount; i++) {
+      const nameIndex = this.buffer.readEncodedU30();
+      const supernameIndex = this.buffer.readEncodedU30();
+      const flags = this.buffer.readUInt8();
 
-    let protectedNs: INamespaceInfo;
+      let protectedNs: INamespaceInfo;
 
-    if (flags & InstanceInfoFlag.ClassProtectedNs) {
-      protectedNs = constantPool.namespaces[this.buffer.readEncodedU30()];
-    }
+      if (flags & InstanceInfoFlag.ClassProtectedNs) {
+        protectedNs = constantPool.namespaces[this.buffer.readEncodedU30()];
+      }
 
-    const interfaceCount = this.buffer.readEncodedU30();
-    const interfaces: MultinameInfo[] = [];
-    for (let i = 0; i < interfaceCount; i++) {
-      interfaces.push(constantPool.multinames[this.buffer.readEncodedU30()]);
-    }
+      const interfaceCount = this.buffer.readEncodedU30();
+      const interfaces: MultinameInfo[] = [];
+      for (let z = 0; z < interfaceCount; z++) {
+        interfaces.push(constantPool.multinames[this.buffer.readEncodedU30()]);
+      }
 
-    const iinitIndex = this.buffer.readEncodedU30();
+      const iinitIndex = this.buffer.readEncodedU30();
 
-    const traitCount = this.buffer.readEncodedU30();
-    const traits: ITrait[] = [];
-    for (let i = 0; i < traitCount; i++) {
-      const nameIndex2 = this.buffer.readEncodedU30();
-      const kind = this.buffer.readUInt8();
-      /*
-      traits.push({
+      const traitCount = this.buffer.readEncodedU30();
+      const traits: ITrait[] = [];
+      for (let x = 0; x < traitCount; x++) {
+        const nameIndex2 = this.buffer.readEncodedU30();
+        const kindAndAttrs = this.buffer.readUInt8();
+        // lower four bits
+        const kind: TraitType = kindAndAttrs & 15;
+        // upper four bits
+        const attrs = kindAndAttrs >> 4;
+
+        switch (kind) {
+          case TraitType.Slot:
+          case TraitType.Const: {
+            const slotId = this.buffer.readEncodedU30();
+            const typeName = this.buffer.readEncodedU30();
+            const vindex = this.buffer.readEncodedU30();
+            let vkind: ConstantKind;
+            if (vindex > 0) {
+              vkind = this.buffer.readUInt8();
+            }
+            break;
+          }
+          case TraitType.Class: {
+            const slotId = this.buffer.readEncodedU30();
+            const classi = this.buffer.readEncodedU30();
+            break;
+          }
+          case TraitType.Function: {
+            const slotId = this.buffer.readEncodedU30();
+            const functionIndex = this.buffer.readEncodedU30();
+            break;
+          }
+          case TraitType.Method:
+          case TraitType.Getter:
+          case TraitType.Setter:
+            const dispId = this.buffer.readEncodedU30();
+            const methodIndex = this.buffer.readEncodedU30();
+        }
+
+        if (attrs & 0x4) {
+          const metadataCount = this.buffer.readEncodedU30();
+          for (let j = 0; j < metadataCount; j++) {
+            this.buffer.readEncodedU30();
+          }
+        }
+
+        /*
+        traits.push({
+          get name() {
+            return constantPool.multinames[nameIndex2];
+          },
+          kind,
+        });
+        */
+      }
+
+      instances.push({
         get name() {
-          return constantPool.multinames[nameIndex2];
+          return constantPool.multinames[nameIndex];
         },
-        kind,
+        get supername() {
+          return constantPool.multinames[supernameIndex];
+        },
+        flags,
+        protectedNs,
+        interfaceCount,
+        interfaces,
+        get iinit() {
+          return methods[iinitIndex];
+        },
+        traitCount,
+        traits,
       });
-      */
     }
-
-    return {
-      get name() {
-        return constantPool.multinames[nameIndex];
-      },
-      get supername() {
-        return constantPool.multinames[supernameIndex];
-      },
-      flags,
-      protectedNs,
-      interfaceCount,
-      interfaces,
-      get iinit() {
-        return methods[iinitIndex];
-      },
-      traitCount,
-      traits,
-    };
+    return instances;
   }
 }

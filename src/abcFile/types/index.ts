@@ -10,7 +10,7 @@ export interface IAbcFile {
   methodCount: number;
   methods: IMethodInfo[];
   metadataCount: number;
-  metadata: IMetadataInfo[];
+  metadataInfos: IMetadataInfo[];
   classCount: number;
   instances: IInstanceInfo[];
 }

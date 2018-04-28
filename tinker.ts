@@ -1,7 +1,7 @@
+import { IQName, MultinameKind } from './src/abcFile/types/multiname';
 import SmarterBuffer from './src/SmarterBuffer';
 import SwfReader from './src/SwfReader';
 import * as Types from './src/Types';
-import { IQName, MultinameKind } from './src/abcFile/Types/multiname';
 
 function log(obj: any) {
   // tslint:disable-next-line:no-console
@@ -31,10 +31,11 @@ const method = methods.filter((m) => m.name.indexOf('deserializeAs_') !== -1);
 
 // log(method[method.length - 1]);
 
-const metadata = doAbc.abcFile.metadata;
+const metadata = doAbc.abcFile.metadataInfos;
 
 // log(metadata);
 
-const instance = doAbc.abcFile.instances[0];
+const instances = doAbc.abcFile.instances;
 
-log(instance);
+log(instances.filter(instance =>
+  instance.name.kind === MultinameKind.QName && instance.name.ns.name.includes('dofus.network.messages')));
