@@ -37,5 +37,11 @@ const metadata = doAbc.abcFile.metadataInfos;
 
 const instances = doAbc.abcFile.instances;
 
-log(instances.filter((instance) =>
-  instance.name.kind === MultinameKind.QName && instance.name.ns.name.includes('dofus.network.messages'))[0]);
+// log(instances.filter((instance) =>
+//  instance.name.kind === MultinameKind.QName && instance.name.ns.name.includes('dofus.network.messages'))[0]);
+
+const methodBodies = doAbc.abcFile.methodBodies;
+
+const body = methodBodies[1];
+
+log(body);

@@ -1,6 +1,6 @@
 import { IClassInfo } from './classes';
 import { IInstanceInfo } from './instance';
-import { IMethodInfo } from './methods';
+import { IMethodBody, IMethodInfo } from './methods';
 import { MultinameInfo } from './multiname';
 import { INamespaceInfo, INamespaceSetInfo } from './namespace';
 import { IScriptInfo } from './scripts';
@@ -18,6 +18,8 @@ export interface IAbcFile {
   classes: IClassInfo[];
   scriptCount: number;
   scripts: IScriptInfo[];
+  methodBodyCount: number;
+  methodBodies: IMethodBody[];
 }
 
 export interface IConstantPool {
