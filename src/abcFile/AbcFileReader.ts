@@ -565,10 +565,6 @@ export default class AbcFileReader {
         code.push(this.readInstruction());
       }
 
-        if( startOffset + codeLength - this.buffer.readOffset !== 0) {
-      console.log(startOffset + codeLength - this.buffer.readOffset);
-      console.log(code);
-        }
       const exceptionCount = this.buffer.readEncodedU30();
       const exceptions = this.readExceptions(exceptionCount, constantPool.multinames);
       const traitCount = this.buffer.readEncodedU30();
@@ -710,7 +706,9 @@ export default class AbcFileReader {
       case InstructionCode.Op_debug: {
         const operand0 = this.buffer.readUInt8();
         const operand1 = this.buffer.readEncodedU30();
-        return { code, operand0, operand1 };
+        const operand2 = this.buffer.readUInt8();
+        const operand3 = this.buffer.readEncodedU30();
+        return { code, operand0, operand1, operand2, operand3 };
       }
       case InstructionCode.Op_debugfile: {
         const operand0 = this.buffer.readEncodedU30();
@@ -826,7 +824,8 @@ export default class AbcFileReader {
       }
       case InstructionCode.Op_hasnext2: {
         const operand0 = this.buffer.readEncodedU30();
-        return { code, operand0 };
+        const operand1 = this.buffer.readEncodedU30();
+        return { code, operand0, operand1 };
       }
       case InstructionCode.Op_ifeq: {
         const operand0 = this.buffer.readS24();
@@ -936,7 +935,7 @@ export default class AbcFileReader {
         const operand0 = this.buffer.readS24();
         const count = this.buffer.readEncodedU30();
         const cases = [];
-        for (let i = 0; i < count; i++) {
+        for (let i = 0; i < count + 1; i++) {
           cases.push(this.buffer.readS24());
         }
         return { code, operand0, cases };
@@ -1111,8 +1110,6 @@ export default class AbcFileReader {
       case InstructionCode.Op_urshift: {
         return { code };
       }
-      default:
-      //throw new Error('unknown instruction ' + code);
     }
   }
 }

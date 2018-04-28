@@ -2,6 +2,7 @@ import { IQName, MultinameKind } from './src/abcFile/types/multiname';
 import SmarterBuffer from './src/SmarterBuffer';
 import SwfReader from './src/SwfReader';
 import * as Types from './src/Types';
+import { InstructionCode } from './src/abcFile/types/bytecode';
 
 function log(obj: any) {
   // tslint:disable-next-line:no-console
@@ -42,6 +43,10 @@ const instances = doAbc.abcFile.instances;
 
 const methodBodies = doAbc.abcFile.methodBodies;
 
-const body = methodBodies[1];
+const body = methodBodies.find((methodBody) => {
+  return methodBody.method.name.includes("deserializeAs_");
+});
 
-log(body);
+//log(body);
+
+log(body.code.map((instr) => InstructionCode[instr.code]));

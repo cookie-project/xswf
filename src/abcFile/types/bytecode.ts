@@ -290,6 +290,8 @@ export interface IDebugInstr extends IInstruction {
   code: InstructionCode.Op_debug;
   operand0: number;
   operand1: number;
+  operand2: number;
+  operand3: number;
 }
 
 export interface IDebugfileInstr extends IInstruction {
@@ -439,6 +441,7 @@ export interface IHasnextInstr extends IInstruction {
 export interface IHasnext2Instr extends IInstruction {
   code: InstructionCode.Op_hasnext2;
   operand0: number;
+  operand1: number;
 }
 
 export interface IIfeqInstr extends IInstruction {
