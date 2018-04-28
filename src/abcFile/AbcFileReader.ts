@@ -442,15 +442,6 @@ export default class AbcFileReader {
             this.buffer.readEncodedU30();
           }
         }
-
-        /*
-        traits.push({
-          get name() {
-            return constantPool.multinames[nameIndex2];
-          },
-          kind,
-        });
-        */
       }
 
       instances.push({

@@ -1,7 +1,9 @@
+import { IClassInfo } from './classes';
 import { IInstanceInfo } from './instance';
 import { IMethodInfo } from './methods';
 import { MultinameInfo } from './multiname';
 import { INamespaceInfo, INamespaceSetInfo } from './namespace';
+import { IScriptInfo } from './scripts';
 
 export interface IAbcFile {
   minorVersion: number;
@@ -13,6 +15,9 @@ export interface IAbcFile {
   metadataInfos: IMetadataInfo[];
   classCount: number;
   instances: IInstanceInfo[];
+  classes: IClassInfo[];
+  scriptCount: number;
+  scripts: IScriptInfo[];
 }
 
 export interface IConstantPool {

@@ -1,3 +1,4 @@
+import { IClassInfo } from './classes';
 import { Constant } from './constant';
 import { IMethodInfo } from './methods';
 import { MultinameInfo } from './multiname';
@@ -35,7 +36,7 @@ export interface ITraitSlot extends ITrait {
 
 export interface ITraitClass extends ITrait {
   kind: TraitKind.Class;
-  class: number;
+  class: IClassInfo;
 }
 
 export interface ITraitFunction extends ITrait {
