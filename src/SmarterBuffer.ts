@@ -90,6 +90,15 @@ export default class SmarterBuffer extends SmartBuffer {
     return result;
   }
 
+  public readS24() {
+    const bytes = [this.readUInt8(), this.readUInt8(), this.readUInt8()];
+    let val = bytes[0] | bytes[1] << 8 | bytes[2] << 16;
+    if (val >> 23 !== 0) {
+      val = val | 0xff000000;
+    }
+    return val;
+  }
+
   public readEncodedU30(): number {
     return this.readEncodedU32() & 0x3FFFFFFF;
   }
