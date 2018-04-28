@@ -3,7 +3,7 @@ import { IAbcFile, IConstantPool, IMetadataInfo } from './types';
 import { IClassInfo } from './types/classes';
 import { Constant, ConstantKind } from './types/constant';
 import { IInstanceInfo, InstanceInfoFlag } from './types/instance';
-import { IMethodInfo, MethodInfoFlag } from './types/methods';
+import { IException, IMethodBody, IMethodInfo, MethodInfoFlag } from './types/methods';
 import { IMultiname, IMultinameL, IQName, IRTQName, IRTQNameL, MultinameInfo, MultinameKind } from './types/multiname';
 import { INamespaceInfo, INamespaceSetInfo, NamespaceKind } from './types/namespace';
 import { IScriptInfo } from './types/scripts';
@@ -38,6 +38,8 @@ export default class AbcFileReader {
     for (let i = 0; i < scriptCount; i++) {
       scripts.push(this.readScript(constantPool, methods, classes));
     }
+    const methodBodyCount = this.buffer.readEncodedU30();
+    const methodBodies = this.readMethodBodies(methodBodyCount, methods, constantPool, classes);
 
     return {
       minorVersion,
@@ -52,6 +54,8 @@ export default class AbcFileReader {
       classes,
       scriptCount,
       scripts,
+      methodBodyCount,
+      methodBodies,
     };
   }
 
@@ -418,11 +422,11 @@ export default class AbcFileReader {
         const dispId = this.buffer.readEncodedU30();
         const methodIndex = this.buffer.readEncodedU30();
         trait = {
+          dispId,
           get name() {
             return constantPool.multinames[nameIndex2];
           },
           kind,
-          dispId,
           get method() {
             return methods[methodIndex];
           },
@@ -519,5 +523,66 @@ export default class AbcFileReader {
       });
     }
     return instances;
+  }
+
+  private readExceptions(exceptionCount: number, multinames: MultinameInfo[]): IException[] {
+    const exceptions: IException[] = [];
+    for (let i = 0; i < exceptionCount; i++) {
+      const from = this.buffer.readEncodedU30();
+      const to = this.buffer.readEncodedU30();
+      const target = this.buffer.readEncodedU30();
+      const excTypeIndex = this.buffer.readEncodedU30();
+      const varNameIndex = this.buffer.readEncodedU30();
+      exceptions.push({
+        from,
+        to,
+        target,
+        get excType() {
+          return multinames[excTypeIndex];
+        },
+        get varName() {
+          return multinames[varNameIndex];
+        },
+      });
+    }
+    return exceptions;
+  }
+
+  private readMethodBodies(methodBodyCount: number, methods: IMethodInfo[],
+                           constantPool: IConstantPool, classes: IClassInfo[]): IMethodBody[] {
+    const methodBodies: IMethodBody[] = [];
+    for (let i = 0; i < methodBodyCount; i++) {
+      const methodIndex = this.buffer.readEncodedU30();
+      const maxStack = this.buffer.readEncodedU30();
+      const localCount = this.buffer.readEncodedU30();
+      const initScopeDepth = this.buffer.readEncodedU30();
+      const maxScopeDepth = this.buffer.readEncodedU30();
+      const codeLength = this.buffer.readEncodedU30();
+      const code = this.buffer.readBuffer(codeLength);
+      const exceptionCount = this.buffer.readEncodedU30();
+      const exceptions = this.readExceptions(exceptionCount, constantPool.multinames);
+      const traitCount = this.buffer.readEncodedU30();
+      const traits: Trait[] = [];
+      for (let y = 0; y < traitCount; y++) {
+        traits.push(this.readTrait(constantPool, methods, classes));
+      }
+
+      methodBodies.push({
+        get method() {
+          return methods[methodIndex];
+        },
+        maxStack,
+        localCount,
+        initScopeDepth,
+        maxScopeDepth,
+        codeLength,
+        code,
+        exceptionCount,
+        exceptions,
+        traitCount,
+        traits,
+      });
+    }
+    return methodBodies;
   }
 }

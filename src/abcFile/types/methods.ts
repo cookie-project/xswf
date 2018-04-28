@@ -1,6 +1,7 @@
 import { Constant } from './constant';
 import { MultinameInfo } from './multiname';
 import { INamespaceInfo } from './namespace';
+import { Trait } from './trait';
 
 export enum MethodInfoFlag {
   NeedArguments = 0x01,
@@ -28,4 +29,26 @@ export interface IMethodInfo {
   flags: number;
   options?: IOptionInfo;
   paramNames?: IParamInfos;
+}
+
+export interface IException {
+  from: number;
+  to: number;
+  target: number;
+  excType: MultinameInfo;
+  varName: MultinameInfo;
+}
+
+export interface IMethodBody {
+  method: IMethodInfo;
+  maxStack: number;
+  localCount: number;
+  initScopeDepth: number;
+  maxScopeDepth: number;
+  codeLength: number;
+  code: Buffer;
+  exceptionCount: number;
+  exceptions: IException[];
+  traitCount: number;
+  traits: Trait[];
 }
