@@ -5,8 +5,7 @@ import { IInstanceInfo, InstanceInfoFlag } from './types/instance';
 import { IMethodInfo, MethodInfoFlag } from './types/methods';
 import { IMultiname, IMultinameL, IQName, IRTQName, IRTQNameL, MultinameInfo, MultinameKind } from './types/multiname';
 import { INamespaceInfo, INamespaceSetInfo, NamespaceKind } from './types/namespace';
-import { ITrait, TraitKind } from './types/trait';
-
+import { ITrait, Trait, TraitKind } from './types/trait';
 /**
  * Spec: https://wwwimages2.adobe.com/content/dam/acom/en/devnet/pdf/avm2overview.pdf
  * Page 18 onwards
@@ -360,7 +359,7 @@ export default class AbcFileReader {
       const iinitIndex = this.buffer.readEncodedU30();
 
       const traitCount = this.buffer.readEncodedU30();
-      const traits: ITrait[] = [];
+      const traits: Trait[] = [];
       for (let x = 0; x < traitCount; x++) {
         const nameIndex2 = this.buffer.readEncodedU30();
         const kindAndAttrs = this.buffer.readUInt8();
@@ -373,22 +372,50 @@ export default class AbcFileReader {
           case TraitKind.Slot:
           case TraitKind.Const: {
             const slotId = this.buffer.readEncodedU30();
-            const typeName = this.buffer.readEncodedU30();
+            const typeNameIndex = this.buffer.readEncodedU30();
             const vindex = this.buffer.readEncodedU30();
             let vkind: ConstantKind;
             if (vindex > 0) {
               vkind = this.buffer.readUInt8();
             }
+            traits.push({
+              get name() {
+                return constantPool.multinames[nameIndex2];
+              },
+              kind,
+              slotId,
+              get typeName() {
+                return constantPool.multinames[typeNameIndex];
+              },
+              value: vkind > 0 ? this.buildConstant(vindex, vindex, constantPool) : undefined,
+            });
             break;
           }
           case TraitKind.Class: {
             const slotId = this.buffer.readEncodedU30();
             const classi = this.buffer.readEncodedU30();
+            traits.push({
+              get name() {
+                return constantPool.multinames[nameIndex2];
+              },
+              kind,
+              class: classi,
+            });
             break;
           }
           case TraitKind.Function: {
             const slotId = this.buffer.readEncodedU30();
             const functionIndex = this.buffer.readEncodedU30();
+            traits.push({
+              get name() {
+                return constantPool.multinames[nameIndex2];
+              },
+              kind,
+              slotId,
+              get func() {
+                return methods[methodIndex];
+              },
+            });
             break;
           }
           case TraitKind.Method:
@@ -396,6 +423,17 @@ export default class AbcFileReader {
           case TraitKind.Setter:
             const dispId = this.buffer.readEncodedU30();
             const methodIndex = this.buffer.readEncodedU30();
+            traits.push({
+              get name() {
+                return constantPool.multinames[nameIndex2];
+              },
+              kind,
+              dispId,
+              get method() {
+                return methods[methodIndex];
+              },
+            });
+            break;
         }
 
         if (attrs & 0x4) {
