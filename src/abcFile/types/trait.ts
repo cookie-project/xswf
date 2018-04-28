@@ -1,14 +1,8 @@
 import { MultinameInfo } from './multiname';
+import { INamespaceInfo } from './namespace';
+import { Constant } from './constant';
 
-export interface ITrait {
-  name: MultinameInfo;
-  kind: number;
-  data: any[];
-  metadataCount?: number;
-  metadata?: { key: string, value: string };
-}
-
-export enum TraitType {
+export enum TraitKind {
   Slot = 0,
   Method = 1,
   Getter = 2,
@@ -19,13 +13,16 @@ export enum TraitType {
 }
 
 export interface ITrait {
-  slotId: number;
+  name: MultinameInfo;
+  kind: TraitKind;
+  metadataCount?: number;
+  metadata?: { key: string, value: string };
 }
 
 export interface ITraitSlot extends ITrait {
+  kind: TraitKind.Slot | TraitKind.Const;
   typeName: MultinameInfo;
-  vIndex: number;
-  vKind: number;
+  value: Constant;
 }
 
 export interface ITraitClass extends ITrait {

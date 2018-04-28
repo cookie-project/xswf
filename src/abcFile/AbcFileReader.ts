@@ -1,10 +1,11 @@
 import SmarterBuffer from './../SmarterBuffer';
 import { IAbcFile, IConstantPool, IMetadataInfo } from './types';
+import { Constant, ConstantKind } from './types/constant';
 import { IInstanceInfo, InstanceInfoFlag } from './types/instance';
-import { ConstantKind, IMethodInfo, IOptionDetail, MethodInfoFlag } from './types/methods';
+import { IMethodInfo, MethodInfoFlag } from './types/methods';
 import { IMultiname, IMultinameL, IQName, IRTQName, IRTQNameL, MultinameInfo, MultinameKind } from './types/multiname';
 import { INamespaceInfo, INamespaceSetInfo, NamespaceKind } from './types/namespace';
-import { ITrait, TraitType } from './types/trait';
+import { ITrait, TraitKind } from './types/trait';
 
 /**
  * Spec: https://wwwimages2.adobe.com/content/dam/acom/en/devnet/pdf/avm2overview.pdf
@@ -186,6 +187,80 @@ export default class AbcFileReader {
     };
   }
 
+  private buildConstant(kind: ConstantKind, valueIndex: number, constantPool: IConstantPool): Constant {
+    switch (kind) {
+      case ConstantKind.Int:
+        return {
+          kind,
+          get val() {
+            return constantPool.integers[valueIndex];
+          },
+        };
+      case ConstantKind.UInt:
+        return {
+          kind,
+          get val() {
+            return constantPool.uintegers[valueIndex];
+          },
+        };
+      case ConstantKind.Double:
+        return {
+          kind,
+          get val() {
+            return constantPool.doubles[valueIndex];
+          },
+        };
+      case ConstantKind.Utf8:
+        return {
+          kind,
+          get val() {
+            return constantPool.strings[valueIndex];
+          },
+        };
+      case ConstantKind.PackageNamespace:
+      case ConstantKind.Namespace:
+      case ConstantKind.PackageInternalNs:
+      case ConstantKind.ProtectedNamespace:
+      case ConstantKind.ExplicitNamespace:
+      case ConstantKind.StaticProtectedNs:
+      case ConstantKind.PrivateNs:
+        return {
+          kind,
+          get val() {
+            return constantPool.namespaces[valueIndex];
+          },
+        };
+      case ConstantKind.True:
+        return {
+          kind,
+          get val(): true {
+            return true;
+          },
+        };
+      case ConstantKind.False:
+        return {
+          kind,
+          get val(): false {
+            return false;
+          },
+        };
+      case ConstantKind.Null:
+        return {
+          kind,
+          get val(): null {
+            return null;
+          },
+        };
+      case ConstantKind.Undefined:
+        return {
+          kind,
+          get val(): null {
+            return undefined;
+          },
+        };
+    }
+  }
+
   private readMethods(methodCount: number, constantPool: IConstantPool): IMethodInfo[] {
     const methods: IMethodInfo[] = [];
     for (let i = 0; i < methodCount; i++) {
@@ -213,39 +288,11 @@ export default class AbcFileReader {
 
       if (flags & MethodInfoFlag.HasOptional) {
         const count = this.buffer.readEncodedU30();
-        const options: IOptionDetail[] = [];
+        const options: Constant[] = [];
         for (let x = 0; x < count; x++) {
           const valIndex = this.buffer.readEncodedU30();
           const kind: ConstantKind = this.buffer.readUInt8();
-          options.push({
-            get val() {
-              switch (kind) {
-                case ConstantKind.Int:
-                  return constantPool.integers[valIndex];
-                case ConstantKind.UInt:
-                  return constantPool.uintegers[valIndex];
-                case ConstantKind.Double:
-                  return constantPool.doubles[valIndex];
-                case ConstantKind.Utf8:
-                  return constantPool.strings[valIndex];
-                case ConstantKind.PackageNamespace:
-                case ConstantKind.Namespace:
-                case ConstantKind.PackageInternalNs:
-                case ConstantKind.ProtectedNamespace:
-                case ConstantKind.ExplicitNamespace:
-                case ConstantKind.StaticProtectedNs:
-                case ConstantKind.PrivateNs:
-                  return constantPool.namespaces[valIndex];
-                case ConstantKind.True:
-                case ConstantKind.False:
-                case ConstantKind.Null:
-                case ConstantKind.Undefined:
-                default:
-                  return null;
-              }
-            },
-            kind,
-          });
+          options.push(this.buildConstant(kind, valIndex, constantPool));
         }
         method.options = { count, options };
       }
@@ -318,13 +365,13 @@ export default class AbcFileReader {
         const nameIndex2 = this.buffer.readEncodedU30();
         const kindAndAttrs = this.buffer.readUInt8();
         // lower four bits
-        const kind: TraitType = kindAndAttrs & 15;
+        const kind: TraitKind = kindAndAttrs & 15;
         // upper four bits
         const attrs = kindAndAttrs >> 4;
 
         switch (kind) {
-          case TraitType.Slot:
-          case TraitType.Const: {
+          case TraitKind.Slot:
+          case TraitKind.Const: {
             const slotId = this.buffer.readEncodedU30();
             const typeName = this.buffer.readEncodedU30();
             const vindex = this.buffer.readEncodedU30();
@@ -334,19 +381,19 @@ export default class AbcFileReader {
             }
             break;
           }
-          case TraitType.Class: {
+          case TraitKind.Class: {
             const slotId = this.buffer.readEncodedU30();
             const classi = this.buffer.readEncodedU30();
             break;
           }
-          case TraitType.Function: {
+          case TraitKind.Function: {
             const slotId = this.buffer.readEncodedU30();
             const functionIndex = this.buffer.readEncodedU30();
             break;
           }
-          case TraitType.Method:
-          case TraitType.Getter:
-          case TraitType.Setter:
+          case TraitKind.Method:
+          case TraitKind.Getter:
+          case TraitKind.Setter:
             const dispId = this.buffer.readEncodedU30();
             const methodIndex = this.buffer.readEncodedU30();
         }
