@@ -343,6 +343,7 @@ export default class AbcFileReader {
         traitCount,
         traits,
       });
+      console.log(instances);
     }
     return instances;
   }

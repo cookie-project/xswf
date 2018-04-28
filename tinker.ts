@@ -1,4 +1,4 @@
-import { IQName, MultinameKind } from './src/abcFile/Types/multiname';
+import { IQName, MultinameKind } from './src/abcFile/types/multiname';
 import SmarterBuffer from './src/SmarterBuffer';
 import SwfReader from './src/SwfReader';
 import * as Types from './src/Types';

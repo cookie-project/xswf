@@ -1,4 +1,4 @@
-import { IAbcFile } from './abcFile/Types';
+import { IAbcFile } from './abcFile/types';
 
 export enum SwfSignature {
   None = 'FWS',
