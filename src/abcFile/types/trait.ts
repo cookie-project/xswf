@@ -1,6 +1,6 @@
+import { Constant } from './constant';
 import { MultinameInfo } from './multiname';
 import { INamespaceInfo } from './namespace';
-import { Constant } from './constant';
 
 export enum TraitKind {
   Slot = 0,
