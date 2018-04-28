@@ -1,7 +1,8 @@
+import { IClassInfo } from './classes';
 import { IMethodInfo } from './methods';
 import { MultinameInfo } from './multiname';
 import { INamespaceInfo } from './namespace';
-import { ITrait } from './trait';
+import { Trait } from './trait';
 
 export enum InstanceInfoFlag {
   ClassSealed = 0x01,
@@ -11,6 +12,7 @@ export enum InstanceInfoFlag {
 }
 
 export interface IInstanceInfo {
+  class: IClassInfo;
   name: MultinameInfo;
   supername: MultinameInfo;
   flags: number;
@@ -19,5 +21,5 @@ export interface IInstanceInfo {
   interfaces: MultinameInfo[];
   iinit: IMethodInfo;
   traitCount: number;
-  traits: ITrait[];
+  traits: Trait[];
 }

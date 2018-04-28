@@ -1,8 +1,11 @@
+// tslint:disable
+
 import { IQName, MultinameKind } from './src/abcFile/types/multiname';
 import SmarterBuffer from './src/SmarterBuffer';
 import SwfReader from './src/SwfReader';
 import * as Types from './src/Types';
 import { InstructionCode } from './src/abcFile/types/bytecode';
+import { TraitKind, ITraitSlot } from './src/abcFile/types/trait';
 
 function log(obj: any) {
   // tslint:disable-next-line:no-console
@@ -43,10 +46,32 @@ const instances = doAbc.abcFile.instances;
 
 const methodBodies = doAbc.abcFile.methodBodies;
 
-const body = methodBodies.find((methodBody) => {
+const bodies = methodBodies.filter((methodBody) => {
   return methodBody.method.name.includes("deserializeAs_");
 });
 
 //log(body);
 
-log(body.code.map((instr) => InstructionCode[instr.code]));
+const opcodes = new Set<InstructionCode>();
+
+bodies.forEach((body) => {
+  body.code.forEach((instr) => {
+    opcodes.add(instr.code);
+  });
+});
+
+//log(opcodes.values());
+
+const messageClasses = doAbc.abcFile.instances.filter(c => c.name.kind === MultinameKind.QName && c.name.ns.name.includes('dofus.network.messages'))
+
+messageClasses.forEach((messageClass) => {
+  const name: IQName = messageClass.name as IQName;
+  const protocolIdTrait = messageClass.class.traits.find((trait) => {
+    return trait.kind === TraitKind.Const && trait.name.kind === MultinameKind.QName && trait.name.name === "protocolId";
+  }) as ITraitSlot;
+  const protocolId: number = protocolIdTrait.value.val as number;
+  console.log(protocolId, name.name);
+});
+
+
+//log(body.code.map((instr) => InstructionCode[instr.code]));

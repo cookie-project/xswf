@@ -32,7 +32,7 @@ export default class AbcFileReader {
     const classes: IClassInfo[] = [];
     const instances = this.readInstances(classCount, constantPool, methods, classes);
     for (let i = 0; i < classCount; i++) {
-      classes.push(this.readClass(constantPool, methods, classes));
+      classes.push(this.readClass(i, constantPool, methods, classes, instances));
     }
     const scriptCount = this.buffer.readEncodedU30();
     const scripts: IScriptInfo[] = [];
@@ -384,7 +384,7 @@ export default class AbcFileReader {
           get typeName() {
             return constantPool.multinames[typeNameIndex];
           },
-          value: vkind > 0 ? this.buildConstant(vindex, vindex, constantPool) : undefined,
+          value: vindex > 0 ? this.buildConstant(vkind, vindex, constantPool) : undefined,
         };
         break;
       }
@@ -445,7 +445,8 @@ export default class AbcFileReader {
     return trait;
   }
 
-  private readClass(constantPool: IConstantPool, methods: IMethodInfo[], classes: IClassInfo[]): IClassInfo {
+  private readClass(index: number, constantPool: IConstantPool, methods: IMethodInfo[], classes: IClassInfo[],
+                    instances: IInstanceInfo[]): IClassInfo {
     const cinitIndex = this.buffer.readEncodedU30();
     const traitCount = this.buffer.readEncodedU30();
     const traits: Trait[] = [];
@@ -453,6 +454,9 @@ export default class AbcFileReader {
       traits.push(this.readTrait(constantPool, methods, classes));
     }
     return {
+      get instance() {
+        return instances[index];
+      },
       get cinit() {
         return methods[cinitIndex];
       },
@@ -506,6 +510,9 @@ export default class AbcFileReader {
       }
 
       instances.push({
+        get class() {
+          return classes[i];
+        },
         get name() {
           return constantPool.multinames[nameIndex];
         },
