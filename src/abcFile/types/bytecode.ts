@@ -576,7 +576,7 @@ export interface ILessthanInstr extends IInstruction {
 export interface ILookupswitchInstr extends IInstruction {
   code: InstructionCode.Op_lookupswitch;
   operand0: number;
-  operand1: number;
+  cases: number[];
 }
 
 export interface ILshiftInstr extends IInstruction {

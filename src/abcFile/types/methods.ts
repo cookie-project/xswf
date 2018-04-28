@@ -1,3 +1,4 @@
+import { Instruction } from './bytecode';
 import { Constant } from './constant';
 import { MultinameInfo } from './multiname';
 import { INamespaceInfo } from './namespace';
@@ -46,7 +47,7 @@ export interface IMethodBody {
   initScopeDepth: number;
   maxScopeDepth: number;
   codeLength: number;
-  code: Buffer;
+  code: Instruction[];
   exceptionCount: number;
   exceptions: IException[];
   traitCount: number;

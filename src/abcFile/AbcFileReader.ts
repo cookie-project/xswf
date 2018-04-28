@@ -1,5 +1,6 @@
 import SmarterBuffer from './../SmarterBuffer';
 import { IAbcFile, IConstantPool, IMetadataInfo } from './types';
+import { Instruction, InstructionCode } from './types/bytecode';
 import { IClassInfo } from './types/classes';
 import { Constant, ConstantKind } from './types/constant';
 import { IInstanceInfo, InstanceInfoFlag } from './types/instance';
@@ -558,7 +559,16 @@ export default class AbcFileReader {
       const initScopeDepth = this.buffer.readEncodedU30();
       const maxScopeDepth = this.buffer.readEncodedU30();
       const codeLength = this.buffer.readEncodedU30();
-      const code = this.buffer.readBuffer(codeLength);
+      const startOffset = this.buffer.readOffset;
+      const code: Instruction[] = [];
+      while (this.buffer.readOffset < startOffset + codeLength) {
+        code.push(this.readInstruction());
+      }
+
+        if( startOffset + codeLength - this.buffer.readOffset !== 0) {
+      console.log(startOffset + codeLength - this.buffer.readOffset);
+      console.log(code);
+        }
       const exceptionCount = this.buffer.readEncodedU30();
       const exceptions = this.readExceptions(exceptionCount, constantPool.multinames);
       const traitCount = this.buffer.readEncodedU30();
@@ -584,5 +594,525 @@ export default class AbcFileReader {
       });
     }
     return methodBodies;
+  }
+
+  private readInstruction(): Instruction {
+    const code: InstructionCode = this.buffer.readUInt8();
+    switch (code) {
+      case InstructionCode.Op_add: {
+        return { code };
+      }
+      case InstructionCode.Op_add_i: {
+        return { code };
+      }
+      case InstructionCode.Op_astype: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_astypelate: {
+        return { code };
+      }
+      case InstructionCode.Op_bitand: {
+        return { code };
+      }
+      case InstructionCode.Op_bitnot: {
+        return { code };
+      }
+      case InstructionCode.Op_bitor: {
+        return { code };
+      }
+      case InstructionCode.Op_bitxor: {
+        return { code };
+      }
+      case InstructionCode.Op_call: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_callmethod: {
+        const operand0 = this.buffer.readEncodedU30();
+        const operand1 = this.buffer.readEncodedU30();
+        return { code, operand0, operand1 };
+      }
+      case InstructionCode.Op_callproperty: {
+        const operand0 = this.buffer.readEncodedU30();
+        const operand1 = this.buffer.readEncodedU30();
+        return { code, operand0, operand1 };
+      }
+      case InstructionCode.Op_callproplex: {
+        const operand0 = this.buffer.readEncodedU30();
+        const operand1 = this.buffer.readEncodedU30();
+        return { code, operand0, operand1 };
+      }
+      case InstructionCode.Op_callpropvoid: {
+        const operand0 = this.buffer.readEncodedU30();
+        const operand1 = this.buffer.readEncodedU30();
+        return { code, operand0, operand1 };
+      }
+      case InstructionCode.Op_callstatic: {
+        const operand0 = this.buffer.readEncodedU30();
+        const operand1 = this.buffer.readEncodedU30();
+        return { code, operand0, operand1 };
+      }
+      case InstructionCode.Op_callsuper: {
+        const operand0 = this.buffer.readEncodedU30();
+        const operand1 = this.buffer.readEncodedU30();
+        return { code, operand0, operand1 };
+      }
+      case InstructionCode.Op_callsupervoid: {
+        const operand0 = this.buffer.readEncodedU30();
+        const operand1 = this.buffer.readEncodedU30();
+        return { code, operand0, operand1 };
+      }
+      case InstructionCode.Op_checkfilter: {
+        return { code };
+      }
+      case InstructionCode.Op_coerce: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_coerce_a: {
+        return { code };
+      }
+      case InstructionCode.Op_coerce_s: {
+        return { code };
+      }
+      case InstructionCode.Op_construct: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_contructprop: {
+        const operand0 = this.buffer.readEncodedU30();
+        const operand1 = this.buffer.readEncodedU30();
+        return { code, operand0, operand1 };
+      }
+      case InstructionCode.Op_constructsuper: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_convert_b: {
+        return { code };
+      }
+      case InstructionCode.Op_convert_i: {
+        return { code };
+      }
+      case InstructionCode.Op_convert_d: {
+        return { code };
+      }
+      case InstructionCode.Op_convert_o: {
+        return { code };
+      }
+      case InstructionCode.Op_convert_u: {
+        return { code };
+      }
+      case InstructionCode.Op_convert_s: {
+        return { code };
+      }
+      case InstructionCode.Op_debug: {
+        const operand0 = this.buffer.readUInt8();
+        const operand1 = this.buffer.readEncodedU30();
+        return { code, operand0, operand1 };
+      }
+      case InstructionCode.Op_debugfile: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_debugline: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_declocal: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_declocal_i: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_decrement: {
+        return { code };
+      }
+      case InstructionCode.Op_decrement_i: {
+        return { code };
+      }
+      case InstructionCode.Op_deleteproperty: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_divide: {
+        return { code };
+      }
+      case InstructionCode.Op_dup: {
+        return { code };
+      }
+      case InstructionCode.Op_dxns: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_dxnslate: {
+        return { code };
+      }
+      case InstructionCode.Op_equals: {
+        return { code };
+      }
+      case InstructionCode.Op_esc_xattr: {
+        return { code };
+      }
+      case InstructionCode.Op_esc_xelem: {
+        return { code };
+      }
+      case InstructionCode.Op_findproperty: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_findpropstrict: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_getdescendants: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_getglobalscope: {
+        return { code };
+      }
+      case InstructionCode.Op_getglobalslot: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_getlex: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_getlocal: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_getlocal_0: {
+        return { code };
+      }
+      case InstructionCode.Op_getlocal_1: {
+        return { code };
+      }
+      case InstructionCode.Op_getlocal_2: {
+        return { code };
+      }
+      case InstructionCode.Op_getlocal_3: {
+        return { code };
+      }
+      case InstructionCode.Op_getproperty: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_getscopeobject: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_getslot: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_getsuper: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_greaterequals: {
+        return { code };
+      }
+      case InstructionCode.Op_greaterthan: {
+        return { code };
+      }
+      case InstructionCode.Op_hasnext: {
+        return { code };
+      }
+      case InstructionCode.Op_hasnext2: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_ifeq: {
+        const operand0 = this.buffer.readS24();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_iffalse: {
+        const operand0 = this.buffer.readS24();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_ifge: {
+        const operand0 = this.buffer.readS24();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_ifgt: {
+        const operand0 = this.buffer.readS24();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_ifle: {
+        const operand0 = this.buffer.readS24();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_iflt: {
+        const operand0 = this.buffer.readS24();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_ifnge: {
+        const operand0 = this.buffer.readS24();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_ifngt: {
+        const operand0 = this.buffer.readS24();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_ifnle: {
+        const operand0 = this.buffer.readS24();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_ifnlt: {
+        const operand0 = this.buffer.readS24();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_ifne: {
+        const operand0 = this.buffer.readS24();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_ifstricteq: {
+        const operand0 = this.buffer.readS24();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_ifstrictne: {
+        const operand0 = this.buffer.readS24();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_iftrue: {
+        const operand0 = this.buffer.readS24();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_in: {
+        return { code };
+      }
+      case InstructionCode.Op_inclocal: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_inclocal_i: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_increment: {
+        return { code };
+      }
+      case InstructionCode.Op_increment_i: {
+        return { code };
+      }
+      case InstructionCode.Op_initproperty: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_instanceof: {
+        return { code };
+      }
+      case InstructionCode.Op_istype: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_istypelate: {
+        return { code };
+      }
+      case InstructionCode.Op_jump: {
+        const operand0 = this.buffer.readS24();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_kill: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_label: {
+        return { code };
+      }
+      case InstructionCode.Op_lessequals: {
+        return { code };
+      }
+      case InstructionCode.Op_lessthan: {
+        return { code };
+      }
+      case InstructionCode.Op_lookupswitch: {
+        const operand0 = this.buffer.readS24();
+        const count = this.buffer.readEncodedU30();
+        const cases = [];
+        for (let i = 0; i < count; i++) {
+          cases.push(this.buffer.readS24());
+        }
+        return { code, operand0, cases };
+      }
+      case InstructionCode.Op_lshift: {
+        return { code };
+      }
+      case InstructionCode.Op_modulo: {
+        return { code };
+      }
+      case InstructionCode.Op_multiply: {
+        return { code };
+      }
+      case InstructionCode.Op_multiply_i: {
+        return { code };
+      }
+      case InstructionCode.Op_negate: {
+        return { code };
+      }
+      case InstructionCode.Op_negate_i: {
+        return { code };
+      }
+      case InstructionCode.Op_newactivation: {
+        return { code };
+      }
+      case InstructionCode.Op_newarray: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_newcatch: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_newclass: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_newfunction: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_newobject: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_nextname: {
+        return { code };
+      }
+      case InstructionCode.Op_nextvalue: {
+        return { code };
+      }
+      case InstructionCode.Op_nop: {
+        return { code };
+      }
+      case InstructionCode.Op_not: {
+        return { code };
+      }
+      case InstructionCode.Op_pop: {
+        return { code };
+      }
+      case InstructionCode.Op_popscope: {
+        return { code };
+      }
+      case InstructionCode.Op_pushbyte: {
+        const operand0 = this.buffer.readUInt8();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_pushdouble: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_pushfalse: {
+        return { code };
+      }
+      case InstructionCode.Op_pushint: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_pushnamespace: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_pushnan: {
+        return { code };
+      }
+      case InstructionCode.Op_pushnull: {
+        return { code };
+      }
+      case InstructionCode.Op_pushscope: {
+        return { code };
+      }
+      case InstructionCode.Op_pushshort: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_pushstring: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_pushtrue: {
+        return { code };
+      }
+      case InstructionCode.Op_pushuint: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_undefined: {
+        return { code };
+      }
+      case InstructionCode.Op_pushwith: {
+        return { code };
+      }
+      case InstructionCode.Op_returnvalue: {
+        return { code };
+      }
+      case InstructionCode.Op_returnvoid: {
+        return { code };
+      }
+      case InstructionCode.Op_rshift: {
+        return { code };
+      }
+      case InstructionCode.Op_setlocal: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_setlocal_0: {
+        return { code };
+      }
+      case InstructionCode.Op_setlocal_1: {
+        return { code };
+      }
+      case InstructionCode.Op_setlocal_2: {
+        return { code };
+      }
+      case InstructionCode.Op_setlocal_3: {
+        return { code };
+      }
+      case InstructionCode.Op_setglobalslot: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_setproperty: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_setslot: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_setsuper: {
+        const operand0 = this.buffer.readEncodedU30();
+        return { code, operand0 };
+      }
+      case InstructionCode.Op_strictequals: {
+        return { code };
+      }
+      case InstructionCode.Op_subtract: {
+        return { code };
+      }
+      case InstructionCode.Op_subtract_i: {
+        return { code };
+      }
+      case InstructionCode.Op_swap: {
+        return { code };
+      }
+      case InstructionCode.Op_throw: {
+        return { code };
+      }
+      case InstructionCode.Op_typeof: {
+        return { code };
+      }
+      case InstructionCode.Op_urshift: {
+        return { code };
+      }
+      default:
+      //throw new Error('unknown instruction ' + code);
+    }
   }
 }
