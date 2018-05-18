@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "mocha --reporter spec -r ts-node/register tests/**/*.spec.ts",
+    "test": "mocha --reporter spec -r ts-node/register tests/**/*.spec.ts --timeout 10000",
     "tinker": "ts-node tinker.ts",
     "build": "tsc",
     "lint": "tslint --project . -t stylish",
@@ -25,12 +25,12 @@
   "devDependencies": {
     "@types/chai": "^4.1.3",
     "@types/mocha": "^5.2.0",
-    "@types/node": "^9.6.15",
+    "@types/node": "^9.6.17",
     "chai": "^4.1.2",
     "mocha": "^5.1.1",
     "ts-node": "^6.0.3",
     "tslint": "^5.10.0",
-    "typescript": "^2.9.0-insiders.20180510"
+    "typescript": "^2.9.0-rc"
   },
   "dependencies": {
     "smart-buffer": "^4.0.1"

@@ -42,7 +42,7 @@ describe('SwfReader - Header', () => {
   });
 
   it('should read the fileLength', () => {
-    expect(file.header.fileLength).equals(20634516);
+    expect(file.header.fileLength).equals(20634732);
   });
 
   it('should read the frameSize', () => {
