@@ -569,7 +569,7 @@ export default class AbcFileReader {
       const startOffset = this.buffer.readOffset;
       const code: Instruction[] = [];
       while (this.buffer.readOffset < startOffset + codeLength) {
-        code.push(this.readInstruction());
+        code.push(this.readInstruction(constantPool));
       }
 
       const exceptionCount = this.buffer.readEncodedU30();
@@ -599,346 +599,356 @@ export default class AbcFileReader {
     return methodBodies;
   }
 
-  private readInstruction(): Instruction {
+  private readInstruction(constantPool: IConstantPool): Instruction {
     const code: InstructionCode = this.buffer.readUInt8();
     switch (code) {
-      case InstructionCode.Op_add: {
+      case InstructionCode.add: {
         return { code };
       }
-      case InstructionCode.Op_add_i: {
+      case InstructionCode.add_i: {
         return { code };
       }
-      case InstructionCode.Op_astype: {
+      case InstructionCode.astype: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_astypelate: {
+      case InstructionCode.astypelate: {
         return { code };
       }
-      case InstructionCode.Op_bitand: {
+      case InstructionCode.bitand: {
         return { code };
       }
-      case InstructionCode.Op_bitnot: {
+      case InstructionCode.bitnot: {
         return { code };
       }
-      case InstructionCode.Op_bitor: {
+      case InstructionCode.bitor: {
         return { code };
       }
-      case InstructionCode.Op_bitxor: {
+      case InstructionCode.bitxor: {
         return { code };
       }
-      case InstructionCode.Op_call: {
+      case InstructionCode.call: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_callmethod: {
+      case InstructionCode.callmethod: {
         const operand0 = this.buffer.readEncodedU30();
         const operand1 = this.buffer.readEncodedU30();
         return { code, operand0, operand1 };
       }
-      case InstructionCode.Op_callproperty: {
+      case InstructionCode.callproperty: {
         const operand0 = this.buffer.readEncodedU30();
         const operand1 = this.buffer.readEncodedU30();
         return { code, operand0, operand1 };
       }
-      case InstructionCode.Op_callproplex: {
+      case InstructionCode.callproplex: {
         const operand0 = this.buffer.readEncodedU30();
         const operand1 = this.buffer.readEncodedU30();
         return { code, operand0, operand1 };
       }
-      case InstructionCode.Op_callpropvoid: {
+      case InstructionCode.callpropvoid: {
+        const index = this.buffer.readEncodedU30();
+        const argCount = this.buffer.readEncodedU30();
+        return {
+          code,
+          get name() {
+            return constantPool.multinames[index];
+          },
+          argCount
+        };
+      }
+      case InstructionCode.callstatic: {
         const operand0 = this.buffer.readEncodedU30();
         const operand1 = this.buffer.readEncodedU30();
         return { code, operand0, operand1 };
       }
-      case InstructionCode.Op_callstatic: {
+      case InstructionCode.callsuper: {
         const operand0 = this.buffer.readEncodedU30();
         const operand1 = this.buffer.readEncodedU30();
         return { code, operand0, operand1 };
       }
-      case InstructionCode.Op_callsuper: {
+      case InstructionCode.callsupervoid: {
         const operand0 = this.buffer.readEncodedU30();
         const operand1 = this.buffer.readEncodedU30();
         return { code, operand0, operand1 };
       }
-      case InstructionCode.Op_callsupervoid: {
-        const operand0 = this.buffer.readEncodedU30();
-        const operand1 = this.buffer.readEncodedU30();
-        return { code, operand0, operand1 };
-      }
-      case InstructionCode.Op_checkfilter: {
+      case InstructionCode.checkfilter: {
         return { code };
       }
-      case InstructionCode.Op_coerce: {
+      case InstructionCode.coerce: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_coerce_a: {
+      case InstructionCode.coerce_a: {
         return { code };
       }
-      case InstructionCode.Op_coerce_s: {
+      case InstructionCode.coerce_s: {
         return { code };
       }
-      case InstructionCode.Op_construct: {
+      case InstructionCode.construct: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_contructprop: {
-        const operand0 = this.buffer.readEncodedU30();
-        const operand1 = this.buffer.readEncodedU30();
-        return { code, operand0, operand1 };
+      case InstructionCode.contructprop: {
+        const index = this.buffer.readEncodedU30();
+        const argCount = this.buffer.readEncodedU30();
+        return {
+          code,
+          get name() { return constantPool.multinames[index]; },
+          argCount
+        };
       }
-      case InstructionCode.Op_constructsuper: {
+      case InstructionCode.constructsuper: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_convert_b: {
+      case InstructionCode.convert_b: {
         return { code };
       }
-      case InstructionCode.Op_convert_i: {
+      case InstructionCode.convert_i: {
         return { code };
       }
-      case InstructionCode.Op_convert_d: {
+      case InstructionCode.convert_d: {
         return { code };
       }
-      case InstructionCode.Op_convert_o: {
+      case InstructionCode.convert_o: {
         return { code };
       }
-      case InstructionCode.Op_convert_u: {
+      case InstructionCode.convert_u: {
         return { code };
       }
-      case InstructionCode.Op_convert_s: {
+      case InstructionCode.convert_s: {
         return { code };
       }
-      case InstructionCode.Op_debug: {
+      case InstructionCode.debug: {
         const operand0 = this.buffer.readUInt8();
         const operand1 = this.buffer.readEncodedU30();
         const operand2 = this.buffer.readUInt8();
         const operand3 = this.buffer.readEncodedU30();
         return { code, operand0, operand1, operand2, operand3 };
       }
-      case InstructionCode.Op_debugfile: {
+      case InstructionCode.debugfile: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_debugline: {
+      case InstructionCode.debugline: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_declocal: {
+      case InstructionCode.declocal: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_declocal_i: {
+      case InstructionCode.declocal_i: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_decrement: {
+      case InstructionCode.decrement: {
         return { code };
       }
-      case InstructionCode.Op_decrement_i: {
+      case InstructionCode.decrement_i: {
         return { code };
       }
-      case InstructionCode.Op_deleteproperty: {
+      case InstructionCode.deleteproperty: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_divide: {
+      case InstructionCode.divide: {
         return { code };
       }
-      case InstructionCode.Op_dup: {
+      case InstructionCode.dup: {
         return { code };
       }
-      case InstructionCode.Op_dxns: {
+      case InstructionCode.dxns: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_dxnslate: {
+      case InstructionCode.dxnslate: {
         return { code };
       }
-      case InstructionCode.Op_equals: {
+      case InstructionCode.equals: {
         return { code };
       }
-      case InstructionCode.Op_esc_xattr: {
+      case InstructionCode.esc_xattr: {
         return { code };
       }
-      case InstructionCode.Op_esc_xelem: {
+      case InstructionCode.esc_xelem: {
         return { code };
       }
-      case InstructionCode.Op_findproperty: {
+      case InstructionCode.findproperty: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_findpropstrict: {
+      case InstructionCode.findpropstrict: {
+        const index = this.buffer.readEncodedU30();
+        return { code, get name() { return constantPool.multinames[index]; } };
+      }
+      case InstructionCode.getdescendants: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_getdescendants: {
-        const operand0 = this.buffer.readEncodedU30();
-        return { code, operand0 };
-      }
-      case InstructionCode.Op_getglobalscope: {
+      case InstructionCode.getglobalscope: {
         return { code };
       }
-      case InstructionCode.Op_getglobalslot: {
+      case InstructionCode.getglobalslot: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_getlex: {
+      case InstructionCode.getlex: {
+        const index = this.buffer.readEncodedU30();
+        return { code, get name() { return constantPool.multinames[index]; } };
+      }
+      case InstructionCode.getlocal: {
+        const index = this.buffer.readEncodedU30();
+        return { code, index };
+      }
+      case InstructionCode.getlocal_0: {
+        return { code };
+      }
+      case InstructionCode.getlocal_1: {
+        return { code };
+      }
+      case InstructionCode.getlocal_2: {
+        return { code };
+      }
+      case InstructionCode.getlocal_3: {
+        return { code };
+      }
+      case InstructionCode.getproperty: {
+        const index = this.buffer.readEncodedU30();
+        return { code, get name() { return constantPool.multinames[index]; } };
+      }
+      case InstructionCode.getscopeobject: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_getlocal: {
+      case InstructionCode.getslot: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_getlocal_0: {
-        return { code };
-      }
-      case InstructionCode.Op_getlocal_1: {
-        return { code };
-      }
-      case InstructionCode.Op_getlocal_2: {
-        return { code };
-      }
-      case InstructionCode.Op_getlocal_3: {
-        return { code };
-      }
-      case InstructionCode.Op_getproperty: {
+      case InstructionCode.getsuper: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_getscopeobject: {
-        const operand0 = this.buffer.readEncodedU30();
-        return { code, operand0 };
-      }
-      case InstructionCode.Op_getslot: {
-        const operand0 = this.buffer.readEncodedU30();
-        return { code, operand0 };
-      }
-      case InstructionCode.Op_getsuper: {
-        const operand0 = this.buffer.readEncodedU30();
-        return { code, operand0 };
-      }
-      case InstructionCode.Op_greaterequals: {
+      case InstructionCode.greaterequals: {
         return { code };
       }
-      case InstructionCode.Op_greaterthan: {
+      case InstructionCode.greaterthan: {
         return { code };
       }
-      case InstructionCode.Op_hasnext: {
+      case InstructionCode.hasnext: {
         return { code };
       }
-      case InstructionCode.Op_hasnext2: {
+      case InstructionCode.hasnext2: {
         const operand0 = this.buffer.readEncodedU30();
         const operand1 = this.buffer.readEncodedU30();
         return { code, operand0, operand1 };
       }
-      case InstructionCode.Op_ifeq: {
+      case InstructionCode.ifeq: {
         const operand0 = this.buffer.readS24();
         return { code, operand0 };
       }
-      case InstructionCode.Op_iffalse: {
+      case InstructionCode.iffalse: {
         const operand0 = this.buffer.readS24();
         return { code, operand0 };
       }
-      case InstructionCode.Op_ifge: {
+      case InstructionCode.ifge: {
         const operand0 = this.buffer.readS24();
         return { code, operand0 };
       }
-      case InstructionCode.Op_ifgt: {
+      case InstructionCode.ifgt: {
         const operand0 = this.buffer.readS24();
         return { code, operand0 };
       }
-      case InstructionCode.Op_ifle: {
+      case InstructionCode.ifle: {
         const operand0 = this.buffer.readS24();
         return { code, operand0 };
       }
-      case InstructionCode.Op_iflt: {
+      case InstructionCode.iflt: {
         const operand0 = this.buffer.readS24();
         return { code, operand0 };
       }
-      case InstructionCode.Op_ifnge: {
+      case InstructionCode.ifnge: {
         const operand0 = this.buffer.readS24();
         return { code, operand0 };
       }
-      case InstructionCode.Op_ifngt: {
+      case InstructionCode.ifngt: {
         const operand0 = this.buffer.readS24();
         return { code, operand0 };
       }
-      case InstructionCode.Op_ifnle: {
+      case InstructionCode.ifnle: {
         const operand0 = this.buffer.readS24();
         return { code, operand0 };
       }
-      case InstructionCode.Op_ifnlt: {
+      case InstructionCode.ifnlt: {
+        const offset = this.buffer.readS24();
+        return { code, offset };
+      }
+      case InstructionCode.ifne: {
         const operand0 = this.buffer.readS24();
         return { code, operand0 };
       }
-      case InstructionCode.Op_ifne: {
+      case InstructionCode.ifstricteq: {
         const operand0 = this.buffer.readS24();
         return { code, operand0 };
       }
-      case InstructionCode.Op_ifstricteq: {
+      case InstructionCode.ifstrictne: {
         const operand0 = this.buffer.readS24();
         return { code, operand0 };
       }
-      case InstructionCode.Op_ifstrictne: {
+      case InstructionCode.iftrue: {
         const operand0 = this.buffer.readS24();
         return { code, operand0 };
       }
-      case InstructionCode.Op_iftrue: {
-        const operand0 = this.buffer.readS24();
-        return { code, operand0 };
-      }
-      case InstructionCode.Op_in: {
+      case InstructionCode.in: {
         return { code };
       }
-      case InstructionCode.Op_inclocal: {
+      case InstructionCode.inclocal: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_inclocal_i: {
+      case InstructionCode.inclocal_i: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_increment: {
+      case InstructionCode.increment: {
         return { code };
       }
-      case InstructionCode.Op_increment_i: {
+      case InstructionCode.increment_i: {
         return { code };
       }
-      case InstructionCode.Op_initproperty: {
+      case InstructionCode.initproperty: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_instanceof: {
+      case InstructionCode.instanceof: {
         return { code };
       }
-      case InstructionCode.Op_istype: {
+      case InstructionCode.istype: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_istypelate: {
+      case InstructionCode.istypelate: {
         return { code };
       }
-      case InstructionCode.Op_jump: {
+      case InstructionCode.jump: {
         const operand0 = this.buffer.readS24();
         return { code, operand0 };
       }
-      case InstructionCode.Op_kill: {
+      case InstructionCode.kill: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_label: {
+      case InstructionCode.label: {
         return { code };
       }
-      case InstructionCode.Op_lessequals: {
+      case InstructionCode.lessequals: {
         return { code };
       }
-      case InstructionCode.Op_lessthan: {
+      case InstructionCode.lessthan: {
         return { code };
       }
-      case InstructionCode.Op_lookupswitch: {
+      case InstructionCode.lookupswitch: {
         const operand0 = this.buffer.readS24();
         const count = this.buffer.readEncodedU30();
         const cases = [];
@@ -947,174 +957,174 @@ export default class AbcFileReader {
         }
         return { code, operand0, cases };
       }
-      case InstructionCode.Op_lshift: {
+      case InstructionCode.lshift: {
         return { code };
       }
-      case InstructionCode.Op_modulo: {
+      case InstructionCode.modulo: {
         return { code };
       }
-      case InstructionCode.Op_multiply: {
+      case InstructionCode.multiply: {
         return { code };
       }
-      case InstructionCode.Op_multiply_i: {
+      case InstructionCode.multiply_i: {
         return { code };
       }
-      case InstructionCode.Op_negate: {
+      case InstructionCode.negate: {
         return { code };
       }
-      case InstructionCode.Op_negate_i: {
+      case InstructionCode.negate_i: {
         return { code };
       }
-      case InstructionCode.Op_newactivation: {
+      case InstructionCode.newactivation: {
         return { code };
       }
-      case InstructionCode.Op_newarray: {
+      case InstructionCode.newarray: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_newcatch: {
+      case InstructionCode.newcatch: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_newclass: {
+      case InstructionCode.newclass: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_newfunction: {
+      case InstructionCode.newfunction: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_newobject: {
+      case InstructionCode.newobject: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_nextname: {
+      case InstructionCode.nextname: {
         return { code };
       }
-      case InstructionCode.Op_nextvalue: {
+      case InstructionCode.nextvalue: {
         return { code };
       }
-      case InstructionCode.Op_nop: {
+      case InstructionCode.nop: {
         return { code };
       }
-      case InstructionCode.Op_not: {
+      case InstructionCode.not: {
         return { code };
       }
-      case InstructionCode.Op_pop: {
+      case InstructionCode.pop: {
         return { code };
       }
-      case InstructionCode.Op_popscope: {
+      case InstructionCode.popscope: {
         return { code };
       }
-      case InstructionCode.Op_pushbyte: {
-        const operand0 = this.buffer.readUInt8();
-        return { code, operand0 };
+      case InstructionCode.pushbyte: {
+        const byteValue = this.buffer.readUInt8();
+        return { code, byteValue };
       }
-      case InstructionCode.Op_pushdouble: {
+      case InstructionCode.pushdouble: {
+        const index = this.buffer.readEncodedU30();
+        return { code, get value() { return constantPool.doubles[index]; } };
+      }
+      case InstructionCode.pushfalse: {
+        return { code };
+      }
+      case InstructionCode.pushint: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_pushfalse: {
-        return { code };
-      }
-      case InstructionCode.Op_pushint: {
+      case InstructionCode.pushnamespace: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_pushnamespace: {
+      case InstructionCode.pushnan: {
+        return { code };
+      }
+      case InstructionCode.pushnull: {
+        return { code };
+      }
+      case InstructionCode.pushscope: {
+        return { code };
+      }
+      case InstructionCode.pushshort: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_pushnan: {
+      case InstructionCode.pushstring: {
+        const index = this.buffer.readEncodedU30();
+        return { code, get value() { return constantPool.strings[index]; } };
+      }
+      case InstructionCode.pushtrue: {
         return { code };
       }
-      case InstructionCode.Op_pushnull: {
-        return { code };
-      }
-      case InstructionCode.Op_pushscope: {
-        return { code };
-      }
-      case InstructionCode.Op_pushshort: {
+      case InstructionCode.pushuint: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_pushstring: {
+      case InstructionCode.undefined: {
+        return { code };
+      }
+      case InstructionCode.pushwith: {
+        return { code };
+      }
+      case InstructionCode.returnvalue: {
+        return { code };
+      }
+      case InstructionCode.returnvoid: {
+        return { code };
+      }
+      case InstructionCode.rshift: {
+        return { code };
+      }
+      case InstructionCode.setlocal: {
+        const index = this.buffer.readEncodedU30();
+        return { code, index };
+      }
+      case InstructionCode.setlocal_0: {
+        return { code };
+      }
+      case InstructionCode.setlocal_1: {
+        return { code };
+      }
+      case InstructionCode.setlocal_2: {
+        return { code };
+      }
+      case InstructionCode.setlocal_3: {
+        return { code };
+      }
+      case InstructionCode.setglobalslot: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_pushtrue: {
-        return { code };
-      }
-      case InstructionCode.Op_pushuint: {
+      case InstructionCode.setproperty: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_undefined: {
-        return { code };
-      }
-      case InstructionCode.Op_pushwith: {
-        return { code };
-      }
-      case InstructionCode.Op_returnvalue: {
-        return { code };
-      }
-      case InstructionCode.Op_returnvoid: {
-        return { code };
-      }
-      case InstructionCode.Op_rshift: {
-        return { code };
-      }
-      case InstructionCode.Op_setlocal: {
+      case InstructionCode.setslot: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_setlocal_0: {
-        return { code };
-      }
-      case InstructionCode.Op_setlocal_1: {
-        return { code };
-      }
-      case InstructionCode.Op_setlocal_2: {
-        return { code };
-      }
-      case InstructionCode.Op_setlocal_3: {
-        return { code };
-      }
-      case InstructionCode.Op_setglobalslot: {
+      case InstructionCode.setsuper: {
         const operand0 = this.buffer.readEncodedU30();
         return { code, operand0 };
       }
-      case InstructionCode.Op_setproperty: {
-        const operand0 = this.buffer.readEncodedU30();
-        return { code, operand0 };
-      }
-      case InstructionCode.Op_setslot: {
-        const operand0 = this.buffer.readEncodedU30();
-        return { code, operand0 };
-      }
-      case InstructionCode.Op_setsuper: {
-        const operand0 = this.buffer.readEncodedU30();
-        return { code, operand0 };
-      }
-      case InstructionCode.Op_strictequals: {
+      case InstructionCode.strictequals: {
         return { code };
       }
-      case InstructionCode.Op_subtract: {
+      case InstructionCode.subtract: {
         return { code };
       }
-      case InstructionCode.Op_subtract_i: {
+      case InstructionCode.subtract_i: {
         return { code };
       }
-      case InstructionCode.Op_swap: {
+      case InstructionCode.swap: {
         return { code };
       }
-      case InstructionCode.Op_throw: {
+      case InstructionCode.throw: {
         return { code };
       }
-      case InstructionCode.Op_typeof: {
+      case InstructionCode.typeof: {
         return { code };
       }
-      case InstructionCode.Op_urshift: {
+      case InstructionCode.urshift: {
         return { code };
       }
     }

@@ -5,7 +5,8 @@ import SmarterBuffer from './src/SmarterBuffer';
 import SwfReader from './src/SwfReader';
 import * as Types from './src/Types';
 import { InstructionCode } from './src/abcFile/types/bytecode';
-import { TraitKind, ITraitSlot } from './src/abcFile/types/trait';
+import { TraitKind, ITraitSlot, ITraitMethod } from './src/abcFile/types/trait';
+import { IMethodInfo } from './src/abcFile/types/methods';
 
 function log(obj: any) {
   // tslint:disable-next-line:no-console
@@ -77,6 +78,22 @@ const orderedMessages = messages.sort((a, b) => a.id - b.id);
 
 const toLog = orderedMessages.map((m) => `${m.id}: ${m.name}`);
 
-log(toLog);
+//log(toLog);
+
+var klass = messageClasses.find(klass => klass.name.kind === MultinameKind.QName && klass.name.name === "MapComplementaryInformationsDataMessage");
+
+const body = doAbc.abcFile.methodBodies.find((m) => m.method.name.includes('serializeAs_MapComplementaryInformationsDataMessage'));
+
+const codes = body.code.filter((c) => {
+  if (c.code === InstructionCode.debug
+    || c.code === InstructionCode.debugfile
+    || c.code === InstructionCode.debugline) {
+    return;
+  }
+  return c;
+});
+// tslint:disable-next-line:no-console
+console.log(codes.map((c) => `${InstructionCode[c.code]} ${JSON.stringify(c)}`).join("\n"))
+//console.log(`${body.method.name} -> ${JSON.stringify(codes.map((c) => `${InstructionCode[c.code]}`))}`);
 
 //log(body.code.map((instr) => InstructionCode[instr.code]));
