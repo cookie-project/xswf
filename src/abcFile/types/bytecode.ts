@@ -196,8 +196,8 @@ export interface ICallmethodInstr extends IInstruction {
 
 export interface ICallpropertyInstr extends IInstruction {
   code: InstructionCode.callproperty;
-  operand0: number;
-  operand1: number;
+  name: IMultinameInfo;
+  argCount: number;
 }
 
 export interface ICallproplexInstr extends IInstruction {

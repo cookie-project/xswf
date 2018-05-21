@@ -637,9 +637,15 @@ export default class AbcFileReader {
         return { code, operand0, operand1 };
       }
       case InstructionCode.callproperty: {
-        const operand0 = this.buffer.readEncodedU30();
-        const operand1 = this.buffer.readEncodedU30();
-        return { code, operand0, operand1 };
+        const index = this.buffer.readEncodedU30();
+        const argCount = this.buffer.readEncodedU30();
+        return {
+          code,
+          get name() {
+            return constantPool.multinames[index];
+          },
+          argCount
+        };
       }
       case InstructionCode.callproplex: {
         const operand0 = this.buffer.readEncodedU30();
