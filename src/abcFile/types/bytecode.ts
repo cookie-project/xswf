@@ -1,4 +1,4 @@
-import { IMultinameInfo } from "./multiname";
+import { IMultinameInfo } from './multiname';
 
 export enum InstructionCode {
   add = 0xa0,

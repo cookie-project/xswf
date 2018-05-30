@@ -640,11 +640,11 @@ export default class AbcFileReader {
         const index = this.buffer.readEncodedU30();
         const argCount = this.buffer.readEncodedU30();
         return {
+          argCount,
           code,
           get name() {
             return constantPool.multinames[index];
           },
-          argCount
         };
       }
       case InstructionCode.callproplex: {
@@ -656,11 +656,11 @@ export default class AbcFileReader {
         const index = this.buffer.readEncodedU30();
         const argCount = this.buffer.readEncodedU30();
         return {
+          argCount,
           code,
           get name() {
             return constantPool.multinames[index];
           },
-          argCount
         };
       }
       case InstructionCode.callstatic: {
@@ -699,9 +699,9 @@ export default class AbcFileReader {
         const index = this.buffer.readEncodedU30();
         const argCount = this.buffer.readEncodedU30();
         return {
+          argCount,
           code,
           get name() { return constantPool.multinames[index]; },
-          argCount
         };
       }
       case InstructionCode.constructsuper: {
