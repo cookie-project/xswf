@@ -569,7 +569,10 @@ export default class AbcFileReader {
       const startOffset = this.buffer.readOffset;
       const code: Instruction[] = [];
       while (this.buffer.readOffset < startOffset + codeLength) {
-        code.push(this.readInstruction(constantPool));
+        const byteOffset = this.buffer.readOffset;
+        code.push(Object.assign(this.readInstruction(constantPool), {
+          byteOffset
+        }));
       }
 
       const exceptionCount = this.buffer.readEncodedU30();

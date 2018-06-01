@@ -148,6 +148,7 @@ export enum InstructionCode {
 
 export interface IInstruction {
   code: InstructionCode;
+  byteOffset?: number;
 }
 
 export interface IAddInstr extends IInstruction {
