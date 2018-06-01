@@ -569,10 +569,8 @@ export default class AbcFileReader {
       const startOffset = this.buffer.readOffset;
       const code: Instruction[] = [];
       while (this.buffer.readOffset < startOffset + codeLength) {
-        const byteOffset = this.buffer.readOffset;
-        code.push(Object.assign(this.readInstruction(constantPool), {
-          byteOffset
-        }));
+        const byteOffset = this.buffer.readOffset - startOffset;
+        code.push(Object.assign(this.readInstruction(constantPool), { byteOffset }));
       }
 
       const exceptionCount = this.buffer.readEncodedU30();
@@ -1135,6 +1133,54 @@ export default class AbcFileReader {
       }
       case InstructionCode.urshift: {
         return { code };
+      }
+      case InstructionCode.applytype: {
+        return { code };
+      }
+      case InstructionCode.bkpt: {
+        return { code };
+      }
+      case InstructionCode.lf32: {
+        return { code };
+      }
+      case InstructionCode.lf64: {
+        return { code };
+      }
+      case InstructionCode.li16: {
+        return { code };
+      }
+      case InstructionCode.li32: {
+        return { code };
+      }
+      case InstructionCode.li8: {
+        return { code };
+      }
+      case InstructionCode.sf32: {
+        return { code };
+      }
+      case InstructionCode.sf64: {
+        return { code };
+      }
+      case InstructionCode.si16: {
+        return { code };
+      }
+      case InstructionCode.si32: {
+        return { code };
+      }
+      case InstructionCode.si8: {
+        return { code };
+      }
+      case InstructionCode.sxi1: {
+        return { code };
+      }
+      case InstructionCode.sxi16: {
+        return { code };
+      }
+      case InstructionCode.sxi8: {
+        return { code };
+      }
+      default: {
+        throw new Error('could not read instruction with code ' + code);
       }
     }
   }

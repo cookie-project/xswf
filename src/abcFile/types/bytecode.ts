@@ -144,11 +144,86 @@ export enum InstructionCode {
   throw = 0x03,
   typeof = 0x95,
   urshift = 0xa7,
+  applytype = 0x53,
+  bkpt = 0x01,
+  lf32 = 0x38,
+  lf64 = 0x39,
+  li16 = 0x36,
+  li32 = 0x37,
+  li8 = 0x35,
+  sf32 = 0x3d,
+  sf64 = 0x3e,
+  si16 = 0x3b,
+  si32 = 0x3c,
+  si8 = 0x3a,
+  sxi1 = 0x50,
+  sxi16 = 0x52,
+  sxi8 = 0x51,
 }
 
 export interface IInstruction {
   code: InstructionCode;
   byteOffset?: number;
+}
+
+export interface ISxi1Instr extends IInstruction {
+  code: InstructionCode.sxi1;
+}
+
+export interface ISxi16Instr extends IInstruction {
+  code: InstructionCode.sxi16;
+}
+
+export interface ISxi8Instr extends IInstruction {
+  code: InstructionCode.sxi8;
+}
+
+export interface ISf32Instr extends IInstruction {
+  code: InstructionCode.sf32;
+}
+
+export interface ISf64Instr extends IInstruction {
+  code: InstructionCode.sf64;
+}
+
+export interface ISi16Instr extends IInstruction {
+  code: InstructionCode.si16;
+}
+
+export interface ISi32Instr extends IInstruction {
+  code: InstructionCode.si32;
+}
+
+export interface ISi8Instr extends IInstruction {
+  code: InstructionCode.si8;
+}
+
+export interface ILf32Instr extends IInstruction {
+  code: InstructionCode.lf32;
+}
+
+export interface ILf64Instr extends IInstruction {
+  code: InstructionCode.lf64;
+}
+
+export interface ILi16Instr extends IInstruction {
+  code: InstructionCode.li16;
+}
+
+export interface ILi32Instr extends IInstruction {
+  code: InstructionCode.li32;
+}
+
+export interface ILi8Instr extends IInstruction {
+  code: InstructionCode.li8;
+}
+
+export interface IBkptInstr extends IInstruction {
+  code: InstructionCode.bkpt;
+}
+
+export interface IApplytypeInstr extends IInstruction {
+  code: InstructionCode.applytype;
 }
 
 export interface IAddInstr extends IInstruction {
@@ -806,6 +881,21 @@ export interface IUrshiftInstr extends IInstruction {
 }
 
 export type Instruction =
+  ISxi1Instr |
+  ISxi16Instr |
+  ISxi8Instr |
+  ISi8Instr |
+  ISf32Instr |
+  ISf64Instr |
+  ISi16Instr |
+  ISi32Instr |
+  ILf32Instr |
+  ILf64Instr |
+  ILi16Instr |
+  ILi32Instr |
+  ILi8Instr |
+  IBkptInstr |
+  IApplytypeInstr |
   IAddInstr |
   IAddIInstr |
   IAstypeInstr |
