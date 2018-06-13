@@ -1,5 +1,5 @@
-import { IMethodInfo } from './methods';
-import { Trait } from './trait';
+import { IMethodInfo } from "./methods";
+import { Trait } from "./trait";
 
 export interface IScriptInfo {
   init: IMethodInfo;

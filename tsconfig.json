@@ -8,8 +8,8 @@
   "include": [
     "src/**/*"
   ],
-  "baseUrl": "src",
+  "baseUrl": "./src",
   "paths": {
-    "@base/*": ["/*"],
+    "@base/*": ["./*"],
   }
 }

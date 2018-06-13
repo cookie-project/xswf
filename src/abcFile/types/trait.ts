@@ -1,8 +1,7 @@
-import { IClassInfo } from './classes';
-import { Constant } from './constant';
-import { IMethodInfo } from './methods';
-import { MultinameInfo } from './multiname';
-import { INamespaceInfo } from './namespace';
+import { IClassInfo } from "./classes";
+import { Constant } from "./constant";
+import { IMethodInfo } from "./methods";
+import { MultinameInfo } from "./multiname";
 
 export enum TraitKind {
   Slot = 0,
@@ -11,20 +10,20 @@ export enum TraitKind {
   Setter = 3,
   Class = 4,
   Function = 5,
-  Const = 6,
+  Const = 6
 }
 
 export enum TraitAttribute {
   Final = 0x1,
   Override = 0x2,
-  Metadata = 0x4,
+  Metadata = 0x4
 }
 
 export interface ITrait {
   name: MultinameInfo;
   kind: TraitKind;
   metadataCount?: number;
-  metadata?: { key: string, value: string };
+  metadata?: { key: string; value: string };
 }
 
 export interface ITraitSlot extends ITrait {

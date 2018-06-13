@@ -1,14 +1,31 @@
-import SmarterBuffer from './../SmarterBuffer';
-import { IAbcFile, IConstantPool, IMetadataInfo } from './types';
-import { Instruction, InstructionCode } from './types/bytecode';
-import { IClassInfo } from './types/classes';
-import { Constant, ConstantKind } from './types/constant';
-import { IInstanceInfo, InstanceInfoFlag } from './types/instance';
-import { IException, IMethodBody, IMethodInfo, MethodInfoFlag } from './types/methods';
-import { IMultiname, IMultinameL, IQName, IRTQName, IRTQNameL, MultinameInfo, MultinameKind } from './types/multiname';
-import { INamespaceInfo, INamespaceSetInfo, NamespaceKind } from './types/namespace';
-import { IScriptInfo } from './types/scripts';
-import { ITrait, Trait, TraitKind } from './types/trait';
+import SmarterBuffer from "./../SmarterBuffer";
+import { IAbcFile, IConstantPool, IMetadataInfo } from "./types";
+import { Instruction, InstructionCode } from "./types/bytecode";
+import { IClassInfo } from "./types/classes";
+import { Constant, ConstantKind } from "./types/constant";
+import { IInstanceInfo, InstanceInfoFlag } from "./types/instance";
+import {
+  IException,
+  IMethodBody,
+  IMethodInfo,
+  MethodInfoFlag
+} from "./types/methods";
+import {
+  IMultiname,
+  IMultinameL,
+  IQName,
+  IRTQName,
+  IRTQNameL,
+  MultinameInfo,
+  MultinameKind
+} from "./types/multiname";
+import {
+  INamespaceInfo,
+  INamespaceSetInfo,
+  NamespaceKind
+} from "./types/namespace";
+import { IScriptInfo } from "./types/scripts";
+import { ITrait, Trait, TraitKind } from "./types/trait";
 /**
  * Spec: https://wwwimages2.adobe.com/content/dam/acom/en/devnet/pdf/avm2overview.pdf
  * Page 18 onwards
@@ -30,9 +47,16 @@ export default class AbcFileReader {
     const metadataInfos = this.readMetadataInfos(metadataCount, constantPool);
     const classCount = this.buffer.readEncodedU30();
     const classes: IClassInfo[] = [];
-    const instances = this.readInstances(classCount, constantPool, methods, classes);
+    const instances = this.readInstances(
+      classCount,
+      constantPool,
+      methods,
+      classes
+    );
     for (let i = 0; i < classCount; i++) {
-      classes.push(this.readClass(i, constantPool, methods, classes, instances));
+      classes.push(
+        this.readClass(i, constantPool, methods, classes, instances)
+      );
     }
     const scriptCount = this.buffer.readEncodedU30();
     const scripts: IScriptInfo[] = [];
@@ -40,7 +64,12 @@ export default class AbcFileReader {
       scripts.push(this.readScript(constantPool, methods, classes));
     }
     const methodBodyCount = this.buffer.readEncodedU30();
-    const methodBodies = this.readMethodBodies(methodBodyCount, methods, constantPool, classes);
+    const methodBodies = this.readMethodBodies(
+      methodBodyCount,
+      methods,
+      constantPool,
+      classes
+    );
 
     return {
       minorVersion,
@@ -56,7 +85,7 @@ export default class AbcFileReader {
       scriptCount,
       scripts,
       methodBodyCount,
-      methodBodies,
+      methodBodies
     };
   }
 
@@ -80,10 +109,10 @@ export default class AbcFileReader {
     }
 
     const stringCount = this.buffer.readEncodedU30();
-    const strings = ['*'];
+    const strings = ["*"];
     for (let i = 1; i < stringCount; i++) {
       const size = this.buffer.readEncodedU30();
-      strings.push(this.buffer.readBuffer(size).toString('utf8'));
+      strings.push(this.buffer.readBuffer(size).toString("utf8"));
     }
 
     const namespaceCount = this.buffer.readEncodedU30();
@@ -95,7 +124,7 @@ export default class AbcFileReader {
         kind,
         get name() {
           return strings[name];
-        },
+        }
       });
     }
 
@@ -127,7 +156,7 @@ export default class AbcFileReader {
             },
             get name() {
               return strings[name];
-            },
+            }
           };
           multinames.push(qname);
           break;
@@ -138,7 +167,7 @@ export default class AbcFileReader {
             kind,
             get name() {
               return strings[name2];
-            },
+            }
           };
           multinames.push(rtqname);
           break;
@@ -158,7 +187,7 @@ export default class AbcFileReader {
             },
             get nsSet() {
               return nsSet[nsSetIndex];
-            },
+            }
           };
           multinames.push(multiname);
           break;
@@ -169,7 +198,7 @@ export default class AbcFileReader {
             kind,
             get nsSet() {
               return nsSet[nsSetIndex2];
-            },
+            }
           };
           multinames.push(multinamel);
           break;
@@ -201,39 +230,43 @@ export default class AbcFileReader {
       nsSetCount,
       nsSet,
       multinameCount,
-      multinames,
+      multinames
     };
   }
 
-  private buildConstant(kind: ConstantKind, valueIndex: number, constantPool: IConstantPool): Constant {
+  private buildConstant(
+    kind: ConstantKind,
+    valueIndex: number,
+    constantPool: IConstantPool
+  ): Constant {
     switch (kind) {
       case ConstantKind.Int:
         return {
           kind,
           get val() {
             return constantPool.integers[valueIndex];
-          },
+          }
         };
       case ConstantKind.UInt:
         return {
           kind,
           get val() {
             return constantPool.uintegers[valueIndex];
-          },
+          }
         };
       case ConstantKind.Double:
         return {
           kind,
           get val() {
             return constantPool.doubles[valueIndex];
-          },
+          }
         };
       case ConstantKind.Utf8:
         return {
           kind,
           get val() {
             return constantPool.strings[valueIndex];
-          },
+          }
         };
       case ConstantKind.PackageNamespace:
       case ConstantKind.Namespace:
@@ -246,40 +279,43 @@ export default class AbcFileReader {
           kind,
           get val() {
             return constantPool.namespaces[valueIndex];
-          },
+          }
         };
       case ConstantKind.True:
         return {
           kind,
           get val(): true {
             return true;
-          },
+          }
         };
       case ConstantKind.False:
         return {
           kind,
           get val(): false {
             return false;
-          },
+          }
         };
       case ConstantKind.Null:
         return {
           kind,
           get val(): null {
             return null;
-          },
+          }
         };
       case ConstantKind.Undefined:
         return {
           kind,
           get val(): null {
             return undefined;
-          },
+          }
         };
     }
   }
 
-  private readMethods(methodCount: number, constantPool: IConstantPool): IMethodInfo[] {
+  private readMethods(
+    methodCount: number,
+    constantPool: IConstantPool
+  ): IMethodInfo[] {
     const methods: IMethodInfo[] = [];
     for (let i = 0; i < methodCount; i++) {
       const paramCount = this.buffer.readEncodedU30();
@@ -301,7 +337,7 @@ export default class AbcFileReader {
         get name() {
           return constantPool.strings[nameIndex];
         },
-        flags,
+        flags
       };
 
       if (flags & MethodInfoFlag.HasOptional) {
@@ -316,7 +352,6 @@ export default class AbcFileReader {
       }
 
       if (flags & MethodInfoFlag.HasParamNames) {
-
         const names: string[] = [];
         for (let y = 0; y < paramCount; y++) {
           const index = this.buffer.readEncodedU30();
@@ -331,7 +366,10 @@ export default class AbcFileReader {
     return methods;
   }
 
-  private readMetadataInfos(metadataCount: number, constantPool: IConstantPool): IMetadataInfo[] {
+  private readMetadataInfos(
+    metadataCount: number,
+    constantPool: IConstantPool
+  ): IMetadataInfo[] {
     const metadatas: IMetadataInfo[] = [];
     for (let i = 0; i < metadataCount; i++) {
       const nameIndex = this.buffer.readEncodedU30();
@@ -350,13 +388,17 @@ export default class AbcFileReader {
         },
         itemCount,
         keys,
-        values,
+        values
       });
     }
     return metadatas;
   }
 
-  private readTrait(constantPool: IConstantPool, methods: IMethodInfo[], classes: IClassInfo[]): Trait {
+  private readTrait(
+    constantPool: IConstantPool,
+    methods: IMethodInfo[],
+    classes: IClassInfo[]
+  ): Trait {
     const nameIndex2 = this.buffer.readEncodedU30();
     const kindAndAttrs = this.buffer.readUInt8();
     // lower four bits
@@ -384,7 +426,10 @@ export default class AbcFileReader {
           get typeName() {
             return constantPool.multinames[typeNameIndex];
           },
-          value: vindex > 0 ? this.buildConstant(vkind, vindex, constantPool) : undefined,
+          value:
+            vindex > 0
+              ? this.buildConstant(vkind, vindex, constantPool)
+              : undefined
         };
         break;
       }
@@ -398,7 +443,7 @@ export default class AbcFileReader {
           kind,
           get class() {
             return classes[classi];
-          },
+          }
         };
         break;
       }
@@ -413,7 +458,7 @@ export default class AbcFileReader {
           slotId,
           get func() {
             return methods[methodIndex];
-          },
+          }
         };
         break;
       }
@@ -430,7 +475,7 @@ export default class AbcFileReader {
           kind,
           get method() {
             return methods[methodIndex];
-          },
+          }
         };
         break;
     }
@@ -445,8 +490,13 @@ export default class AbcFileReader {
     return trait;
   }
 
-  private readClass(index: number, constantPool: IConstantPool, methods: IMethodInfo[], classes: IClassInfo[],
-                    instances: IInstanceInfo[]): IClassInfo {
+  private readClass(
+    index: number,
+    constantPool: IConstantPool,
+    methods: IMethodInfo[],
+    classes: IClassInfo[],
+    instances: IInstanceInfo[]
+  ): IClassInfo {
     const cinitIndex = this.buffer.readEncodedU30();
     const traitCount = this.buffer.readEncodedU30();
     const traits: Trait[] = [];
@@ -461,11 +511,15 @@ export default class AbcFileReader {
         return methods[cinitIndex];
       },
       traitCount,
-      traits,
+      traits
     };
   }
 
-  private readScript(constantPool: IConstantPool, methods: IMethodInfo[], classes: IClassInfo[]): IScriptInfo {
+  private readScript(
+    constantPool: IConstantPool,
+    methods: IMethodInfo[],
+    classes: IClassInfo[]
+  ): IScriptInfo {
     const initIndex = this.buffer.readEncodedU30();
     const traitCount = this.buffer.readEncodedU30();
     const traits: Trait[] = [];
@@ -477,12 +531,16 @@ export default class AbcFileReader {
         return methods[initIndex];
       },
       traitCount,
-      traits,
+      traits
     };
   }
 
-  private readInstances(classCount: number, constantPool: IConstantPool, methods: IMethodInfo[],
-                        classes: IClassInfo[]): IInstanceInfo[] {
+  private readInstances(
+    classCount: number,
+    constantPool: IConstantPool,
+    methods: IMethodInfo[],
+    classes: IClassInfo[]
+  ): IInstanceInfo[] {
     const instances: IInstanceInfo[] = [];
     for (let i = 0; i < classCount; i++) {
       const nameIndex = this.buffer.readEncodedU30();
@@ -527,13 +585,16 @@ export default class AbcFileReader {
           return methods[iinitIndex];
         },
         traitCount,
-        traits,
+        traits
       });
     }
     return instances;
   }
 
-  private readExceptions(exceptionCount: number, multinames: MultinameInfo[]): IException[] {
+  private readExceptions(
+    exceptionCount: number,
+    multinames: MultinameInfo[]
+  ): IException[] {
     const exceptions: IException[] = [];
     for (let i = 0; i < exceptionCount; i++) {
       const from = this.buffer.readEncodedU30();
@@ -550,14 +611,18 @@ export default class AbcFileReader {
         },
         get varName() {
           return multinames[varNameIndex];
-        },
+        }
       });
     }
     return exceptions;
   }
 
-  private readMethodBodies(methodBodyCount: number, methods: IMethodInfo[],
-                           constantPool: IConstantPool, classes: IClassInfo[]): IMethodBody[] {
+  private readMethodBodies(
+    methodBodyCount: number,
+    methods: IMethodInfo[],
+    constantPool: IConstantPool,
+    classes: IClassInfo[]
+  ): IMethodBody[] {
     const methodBodies: IMethodBody[] = [];
     for (let i = 0; i < methodBodyCount; i++) {
       const methodIndex = this.buffer.readEncodedU30();
@@ -570,11 +635,16 @@ export default class AbcFileReader {
       const code: Instruction[] = [];
       while (this.buffer.readOffset < startOffset + codeLength) {
         const byteOffset = this.buffer.readOffset - startOffset;
-        code.push(Object.assign(this.readInstruction(constantPool), { byteOffset }));
+        code.push(
+          Object.assign(this.readInstruction(constantPool), { byteOffset })
+        );
       }
 
       const exceptionCount = this.buffer.readEncodedU30();
-      const exceptions = this.readExceptions(exceptionCount, constantPool.multinames);
+      const exceptions = this.readExceptions(
+        exceptionCount,
+        constantPool.multinames
+      );
       const traitCount = this.buffer.readEncodedU30();
       const traits: Trait[] = [];
       for (let y = 0; y < traitCount; y++) {
@@ -594,7 +664,7 @@ export default class AbcFileReader {
         exceptionCount,
         exceptions,
         traitCount,
-        traits,
+        traits
       });
     }
     return methodBodies;
@@ -645,7 +715,7 @@ export default class AbcFileReader {
           code,
           get name() {
             return constantPool.multinames[index];
-          },
+          }
         };
       }
       case InstructionCode.callproplex: {
@@ -661,7 +731,7 @@ export default class AbcFileReader {
           code,
           get name() {
             return constantPool.multinames[index];
-          },
+          }
         };
       }
       case InstructionCode.callstatic: {
@@ -702,7 +772,9 @@ export default class AbcFileReader {
         return {
           argCount,
           code,
-          get name() { return constantPool.multinames[index]; },
+          get name() {
+            return constantPool.multinames[index];
+          }
         };
       }
       case InstructionCode.constructsuper: {
@@ -788,7 +860,12 @@ export default class AbcFileReader {
       }
       case InstructionCode.findpropstrict: {
         const index = this.buffer.readEncodedU30();
-        return { code, get name() { return constantPool.multinames[index]; } };
+        return {
+          code,
+          get name() {
+            return constantPool.multinames[index];
+          }
+        };
       }
       case InstructionCode.getdescendants: {
         const operand0 = this.buffer.readEncodedU30();
@@ -803,7 +880,12 @@ export default class AbcFileReader {
       }
       case InstructionCode.getlex: {
         const index = this.buffer.readEncodedU30();
-        return { code, get name() { return constantPool.multinames[index]; } };
+        return {
+          code,
+          get name() {
+            return constantPool.multinames[index];
+          }
+        };
       }
       case InstructionCode.getlocal: {
         const index = this.buffer.readEncodedU30();
@@ -823,7 +905,12 @@ export default class AbcFileReader {
       }
       case InstructionCode.getproperty: {
         const index = this.buffer.readEncodedU30();
-        return { code, get name() { return constantPool.multinames[index]; } };
+        return {
+          code,
+          get name() {
+            return constantPool.multinames[index];
+          }
+        };
       }
       case InstructionCode.getscopeobject: {
         const operand0 = this.buffer.readEncodedU30();
@@ -1029,7 +1116,12 @@ export default class AbcFileReader {
       }
       case InstructionCode.pushdouble: {
         const index = this.buffer.readEncodedU30();
-        return { code, get value() { return constantPool.doubles[index]; } };
+        return {
+          code,
+          get value() {
+            return constantPool.doubles[index];
+          }
+        };
       }
       case InstructionCode.pushfalse: {
         return { code };
@@ -1057,7 +1149,12 @@ export default class AbcFileReader {
       }
       case InstructionCode.pushstring: {
         const index = this.buffer.readEncodedU30();
-        return { code, get value() { return constantPool.strings[index]; } };
+        return {
+          code,
+          get value() {
+            return constantPool.strings[index];
+          }
+        };
       }
       case InstructionCode.pushtrue: {
         return { code };
@@ -1180,7 +1277,7 @@ export default class AbcFileReader {
         return { code };
       }
       default: {
-        throw new Error('could not read instruction with code ' + code);
+        throw new Error("could not read instruction with code " + code);
       }
     }
   }

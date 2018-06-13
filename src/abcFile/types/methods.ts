@@ -1,8 +1,7 @@
-import { Instruction } from './bytecode';
-import { Constant } from './constant';
-import { MultinameInfo } from './multiname';
-import { INamespaceInfo } from './namespace';
-import { Trait } from './trait';
+import { Instruction } from "./bytecode";
+import { Constant } from "./constant";
+import { MultinameInfo } from "./multiname";
+import { Trait } from "./trait";
 
 export enum MethodInfoFlag {
   NeedArguments = 0x01,
@@ -10,7 +9,7 @@ export enum MethodInfoFlag {
   NeedRest = 0x04,
   HasOptional = 0x08,
   SetDxns = 0x40,
-  HasParamNames = 0x80,
+  HasParamNames = 0x80
 }
 
 export interface IOptionInfo {

@@ -1,8 +1,11 @@
-import { SmartBuffer, SmartBufferOptions } from 'smart-buffer';
-import { IRect } from './Types';
+import { SmartBuffer, SmartBufferOptions } from "smart-buffer";
+import { IRect } from "./Types";
 
 export default class SmarterBuffer extends SmartBuffer {
-  public static fromBuffer(buff: Buffer, encoding?: BufferEncoding): SmarterBuffer {
+  public static fromBuffer(
+    buff: Buffer,
+    encoding?: BufferEncoding
+  ): SmarterBuffer {
     return new this({ encoding, buff });
   }
 
@@ -39,21 +42,26 @@ export default class SmarterBuffer extends SmartBuffer {
         break;
     }
 
-    return before + (after / Math.pow(2, size / 2));
+    return before + after / Math.pow(2, size / 2);
   }
 
   public readUBits(n: number): number {
     let r = 0;
     while (n > 0) {
-      if (this.lastByteCache == null || this.lastByteCacheBitOffset === 8 ||
-          this.lastByteCacheOffset < this.readOffset - 1) {
+      if (
+        this.lastByteCache == null ||
+        this.lastByteCacheBitOffset === 8 ||
+        this.lastByteCacheOffset < this.readOffset - 1
+      ) {
         this.lastByteCacheOffset = this.readOffset;
         this.lastByteCache = this.readUInt8();
         this.lastByteCacheBitOffset = 0;
       }
       const bitsInCache = 8 - this.lastByteCacheBitOffset;
       const x = Math.min(bitsInCache, n);
-      r = (r << x) | ((this.lastByteCache >> (bitsInCache - x)) & (Math.pow(2, x) - 1));
+      r =
+        (r << x) |
+        ((this.lastByteCache >> (bitsInCache - x)) & (Math.pow(2, x) - 1));
       this.lastByteCacheBitOffset += x;
       n -= x;
     }
@@ -74,25 +82,25 @@ export default class SmarterBuffer extends SmartBuffer {
     if (!(result & 0x00000080)) {
       return result;
     }
-    result = (result & 0x0000007f) | this.readInt8() << 7;
+    result = (result & 0x0000007f) | (this.readInt8() << 7);
     if (!(result & 0x00004000)) {
       return result;
     }
-    result = (result & 0x00003fff) | this.readInt8() << 14;
+    result = (result & 0x00003fff) | (this.readInt8() << 14);
     if (!(result & 0x00200000)) {
       return result;
     }
-    result = (result & 0x001fffff) | this.readInt8() << 21;
+    result = (result & 0x001fffff) | (this.readInt8() << 21);
     if (!(result & 0x10000000)) {
       return result;
     }
-    result = (result & 0x0fffffff) | this.readInt8() << 28;
+    result = (result & 0x0fffffff) | (this.readInt8() << 28);
     return result;
   }
 
   public readS24() {
     const bytes = [this.readUInt8(), this.readUInt8(), this.readUInt8()];
-    let val = bytes[0] | bytes[1] << 8 | bytes[2] << 16;
+    let val = bytes[0] | (bytes[1] << 8) | (bytes[2] << 16);
     if (val >> 23 !== 0) {
       val = val | 0xff000000;
     }
@@ -100,6 +108,6 @@ export default class SmarterBuffer extends SmartBuffer {
   }
 
   public readEncodedU30(): number {
-    return this.readEncodedU32() & 0x3FFFFFFF;
+    return this.readEncodedU32() & 0x3fffffff;
   }
 }

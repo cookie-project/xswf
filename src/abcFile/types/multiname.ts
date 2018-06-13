@@ -1,17 +1,17 @@
-import { INamespaceInfo, INamespaceSetInfo } from './namespace';
+import { INamespaceInfo, INamespaceSetInfo } from "./namespace";
 
 export enum MultinameKind {
   QName = 0x07,
-  QNameA = 0x0D,
-  RTQName = 0x0F,
+  QNameA = 0x0d,
+  RTQName = 0x0f,
   RTQNameA = 0x10,
   RTQNAmeL = 0x11,
   RTQNameLA = 0x12,
   Multiname = 0x09,
-  MultinameA = 0x0E,
-  MultinameL = 0x1B,
-  MultinameLA = 0x1C,
-  TypeName = 0x1D,
+  MultinameA = 0x0e,
+  MultinameL = 0x1b,
+  MultinameLA = 0x1c,
+  TypeName = 0x1d
 }
 
 export interface IMultinameInfo {
@@ -50,4 +50,10 @@ export interface ITypeName extends IMultinameInfo {
   params: number[];
 }
 
-export type MultinameInfo = IQName | IRTQName | IRTQNameL | IMultiname | IMultinameL | ITypeName;
+export type MultinameInfo =
+  | IQName
+  | IRTQName
+  | IRTQNameL
+  | IMultiname
+  | IMultinameL
+  | ITypeName;

@@ -1,9 +1,9 @@
-import { IAbcFile } from './abcFile/types';
+import { IAbcFile } from "./abcFile/types";
 
 export enum SwfSignature {
-  None = 'FWS',
-  Zlib = 'CWS',
-  Lzma = 'ZWS',
+  None = "FWS",
+  Zlib = "CWS",
+  Lzma = "ZWS"
 }
 
 export enum TagCode {
@@ -71,7 +71,7 @@ export enum TagCode {
   DefineFontName = 88,
   StartSound2 = 89,
   DefineBitsJPEG4 = 90,
-  DefineFont4 = 91,
+  DefineFont4 = 91
 }
 
 export interface IHeader {
@@ -100,22 +100,70 @@ export interface ITagEnd extends ITag {
 }
 
 export interface ITagOther extends ITag {
-  code: TagCode.ShowFrame  | TagCode.DefineShape  | TagCode.PlaceObject  | TagCode.RemoveObject
-  | TagCode.DefineBits  | TagCode.DefineButton  | TagCode.JPEGTables  | TagCode.SetBackgroundColor
-  | TagCode.DefineFont  | TagCode.DefineText  | TagCode.DoAction  | TagCode.DefineFontInfo  | TagCode.DefineSound
-  | TagCode.StartSound  | TagCode.DefineButtonSound  | TagCode.SoundStreamHead  | TagCode.SoundStreamBlock
-  | TagCode.DefineBitsLossless  | TagCode.DefineBitsJPEG2  | TagCode.DefineShape2  | TagCode.DefineButtonCxform
-  | TagCode.Protect  | TagCode.PlaceObject2  | TagCode.RemoveObject2  | TagCode.DefineShape3  | TagCode.DefineText2
-  | TagCode.DefineButton2  | TagCode.DefineBitsJPEG3  | TagCode.DefineBitsLossless2  | TagCode.DefineEditText
-  | TagCode.DefineSprite  | TagCode.ProductInfo  | TagCode.FrameLabel  | TagCode.SoundStreamHead2
-  | TagCode.DefineMorphShape  | TagCode.DefineFont2  | TagCode.ExportAssets  | TagCode.ImportAssets
-  | TagCode.EnableDebugger  | TagCode.DoInitAction  | TagCode.DefineVideoStream  | TagCode.VideoFrame
-  | TagCode.DefineFontInfo2  | TagCode.EnableDebugger2  | TagCode.ScriptLimits  | TagCode.SetTabIndex
-  | TagCode.FileAttributes  | TagCode.PlaceObject3  | TagCode.ImportAssets2  | TagCode.DefineFontAlignZones
-  | TagCode.CSMTextSettings  | TagCode.DefineFont3  | TagCode.SymbolClass  | TagCode.Metadata
-  | TagCode.DefineScalingGrid  | TagCode.DefineShape4  | TagCode.DefineMorphShape2
-  | TagCode.DefineSceneAndFrameLabelData  | TagCode.DefineBinaryData  | TagCode.DefineFontName
-  | TagCode.StartSound2  | TagCode.DefineBitsJPEG4  | TagCode.DefineFont4;
+  code:
+    | TagCode.ShowFrame
+    | TagCode.DefineShape
+    | TagCode.PlaceObject
+    | TagCode.RemoveObject
+    | TagCode.DefineBits
+    | TagCode.DefineButton
+    | TagCode.JPEGTables
+    | TagCode.SetBackgroundColor
+    | TagCode.DefineFont
+    | TagCode.DefineText
+    | TagCode.DoAction
+    | TagCode.DefineFontInfo
+    | TagCode.DefineSound
+    | TagCode.StartSound
+    | TagCode.DefineButtonSound
+    | TagCode.SoundStreamHead
+    | TagCode.SoundStreamBlock
+    | TagCode.DefineBitsLossless
+    | TagCode.DefineBitsJPEG2
+    | TagCode.DefineShape2
+    | TagCode.DefineButtonCxform
+    | TagCode.Protect
+    | TagCode.PlaceObject2
+    | TagCode.RemoveObject2
+    | TagCode.DefineShape3
+    | TagCode.DefineText2
+    | TagCode.DefineButton2
+    | TagCode.DefineBitsJPEG3
+    | TagCode.DefineBitsLossless2
+    | TagCode.DefineEditText
+    | TagCode.DefineSprite
+    | TagCode.ProductInfo
+    | TagCode.FrameLabel
+    | TagCode.SoundStreamHead2
+    | TagCode.DefineMorphShape
+    | TagCode.DefineFont2
+    | TagCode.ExportAssets
+    | TagCode.ImportAssets
+    | TagCode.EnableDebugger
+    | TagCode.DoInitAction
+    | TagCode.DefineVideoStream
+    | TagCode.VideoFrame
+    | TagCode.DefineFontInfo2
+    | TagCode.EnableDebugger2
+    | TagCode.ScriptLimits
+    | TagCode.SetTabIndex
+    | TagCode.FileAttributes
+    | TagCode.PlaceObject3
+    | TagCode.ImportAssets2
+    | TagCode.DefineFontAlignZones
+    | TagCode.CSMTextSettings
+    | TagCode.DefineFont3
+    | TagCode.SymbolClass
+    | TagCode.Metadata
+    | TagCode.DefineScalingGrid
+    | TagCode.DefineShape4
+    | TagCode.DefineMorphShape2
+    | TagCode.DefineSceneAndFrameLabelData
+    | TagCode.DefineBinaryData
+    | TagCode.DefineFontName
+    | TagCode.StartSound2
+    | TagCode.DefineBitsJPEG4
+    | TagCode.DefineFont4;
   data: Buffer;
 }
 

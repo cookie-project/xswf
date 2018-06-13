@@ -1,9 +1,9 @@
-import { IClassInfo } from './classes';
-import { IInstanceInfo } from './instance';
-import { IMethodBody, IMethodInfo } from './methods';
-import { MultinameInfo } from './multiname';
-import { INamespaceInfo, INamespaceSetInfo } from './namespace';
-import { IScriptInfo } from './scripts';
+import { IClassInfo } from "./classes";
+import { IInstanceInfo } from "./instance";
+import { IMethodBody, IMethodInfo } from "./methods";
+import { MultinameInfo } from "./multiname";
+import { INamespaceInfo, INamespaceSetInfo } from "./namespace";
+import { IScriptInfo } from "./scripts";
 
 export interface IAbcFile {
   minorVersion: number;

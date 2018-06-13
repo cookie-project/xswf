@@ -9,8 +9,8 @@ export enum NamespaceKind {
   PackageInternalNs = 0x17,
   ProtectedNamespace = 0x18,
   ExplicitNamespace = 0x19,
-  StaticProtectedNs = 0x1A,
-  PrivateNs = 0x05,
+  StaticProtectedNs = 0x1a,
+  PrivateNs = 0x05
 }
 
 export interface INamespaceSetInfo {

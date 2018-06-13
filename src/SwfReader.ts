@@ -58,7 +58,7 @@ export default class SwfReader {
     const code: TagCode = tagCodeAndLength >> 6;
     let length = tagCodeAndLength & 63;
     if (length === 63) {
-      length = this.buffer.readInt32LE();
+      length = this.buffer.readUInt32LE();
     }
     const data = this.buffer.readBuffer(length);
     switch (code) {
