@@ -46,8 +46,8 @@ export interface IMultinameL extends IMultinameInfo {
 
 export interface ITypeName extends IMultinameInfo {
   kind: MultinameKind.TypeName;
-  name: number;
-  params: number[];
+  name: MultinameInfo;
+  names: MultinameInfo[];
 }
 
 export type MultinameInfo =

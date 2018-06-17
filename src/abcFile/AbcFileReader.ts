@@ -16,6 +16,7 @@ import {
   IQName,
   IRTQName,
   IRTQNameL,
+  ITypeName,
   MultinameInfo,
   MultinameKind
 } from "./types/multiname";
@@ -25,7 +26,7 @@ import {
   NamespaceKind
 } from "./types/namespace";
 import { IScriptInfo } from "./types/scripts";
-import { ITrait, Trait, TraitKind } from "./types/trait";
+import { ITrait, Trait, TraitAttribute, TraitKind } from "./types/trait";
 /**
  * Spec: https://wwwimages2.adobe.com/content/dam/acom/en/devnet/pdf/avm2overview.pdf
  * Page 18 onwards
@@ -47,29 +48,36 @@ export default class AbcFileReader {
     const metadataInfos = this.readMetadataInfos(metadataCount, constantPool);
     const classCount = this.buffer.readEncodedU30();
     const classes: IClassInfo[] = [];
+    const methodBodies: IMethodBody[] = [];
     const instances = this.readInstances(
       classCount,
       constantPool,
       methods,
-      classes
+      classes,
+      methodBodies
     );
     for (let i = 0; i < classCount; i++) {
       classes.push(
-        this.readClass(i, constantPool, methods, classes, instances)
+        this.readClass(i, constantPool, methods, classes, instances, methodBodies)
       );
     }
     const scriptCount = this.buffer.readEncodedU30();
     const scripts: IScriptInfo[] = [];
     for (let i = 0; i < scriptCount; i++) {
-      scripts.push(this.readScript(constantPool, methods, classes));
+      scripts.push(this.readScript(constantPool, methods, classes, methodBodies));
     }
     const methodBodyCount = this.buffer.readEncodedU30();
-    const methodBodies = this.readMethodBodies(
-      methodBodyCount,
-      methods,
-      constantPool,
-      classes
-    );
+    for (let i = 0; i < methodBodyCount; i++) {
+      methodBodies.push(
+        this.readMethodBodies(
+          methodBodyCount,
+          methods,
+          constantPool,
+          classes,
+          methodBodies
+        )
+      );
+    }
 
     return {
       minorVersion,
@@ -203,12 +211,22 @@ export default class AbcFileReader {
           multinames.push(multinamel);
           break;
         case MultinameKind.TypeName:
-          const nameIndex1 = this.buffer.readEncodedU30();
+          const name4 = this.buffer.readEncodedU30();
           const paramsCount = this.buffer.readEncodedU30();
+          const params: number[] = [];
           for (let j = 0; j < paramsCount; j++) {
-            this.buffer.readEncodedU30();
+            params.push(this.buffer.readEncodedU30());
           }
-          multinames.push(null);
+          const typeName: ITypeName = {
+            kind,
+            get name() {
+              return multinames[name4];
+            },
+            get names() {
+              return params.map(p => multinames[p]);
+            },
+          }
+          multinames.push(typeName);
           break;
         default:
           multinames.push(null);
@@ -397,7 +415,8 @@ export default class AbcFileReader {
   private readTrait(
     constantPool: IConstantPool,
     methods: IMethodInfo[],
-    classes: IClassInfo[]
+    classes: IClassInfo[],
+    methodBodies: IMethodBody[]
   ): Trait {
     const nameIndex2 = this.buffer.readEncodedU30();
     const kindAndAttrs = this.buffer.readUInt8();
@@ -419,7 +438,7 @@ export default class AbcFileReader {
         }
         trait = {
           get name() {
-            return constantPool.multinames[nameIndex2];
+            return constantPool.multinames[nameIndex2] as IQName;
           },
           kind,
           slotId,
@@ -438,7 +457,7 @@ export default class AbcFileReader {
         const classi = this.buffer.readEncodedU30();
         trait = {
           get name() {
-            return constantPool.multinames[nameIndex2];
+            return constantPool.multinames[nameIndex2] as IQName;
           },
           kind,
           get class() {
@@ -452,13 +471,16 @@ export default class AbcFileReader {
         const functionIndex = this.buffer.readEncodedU30();
         trait = {
           get name() {
-            return constantPool.multinames[nameIndex2];
+            return constantPool.multinames[nameIndex2] as IQName;
           },
           kind,
           slotId,
           get func() {
             return methods[methodIndex];
-          }
+          },
+          get funcBody() {
+            return methodBodies.find((mb) => mb.methodIndex === methodIndex);
+          },
         };
         break;
       }
@@ -467,15 +489,25 @@ export default class AbcFileReader {
       case TraitKind.Setter:
         const dispId = this.buffer.readEncodedU30();
         const methodIndex = this.buffer.readEncodedU30();
+        let attribute: TraitAttribute;
+        if (attrs & 0x1) {
+          attribute = TraitAttribute.Final;
+        } else if (attrs & 0x2) {
+          attribute = TraitAttribute.Override
+        }
         trait = {
           dispId,
           get name() {
-            return constantPool.multinames[nameIndex2];
+            return constantPool.multinames[nameIndex2] as IQName;
           },
+          attribute,
           kind,
           get method() {
             return methods[methodIndex];
-          }
+          },
+          get methodBody() {
+            return methodBodies.find((mb) => mb.methodIndex === methodIndex);
+          },
         };
         break;
     }
@@ -495,13 +527,14 @@ export default class AbcFileReader {
     constantPool: IConstantPool,
     methods: IMethodInfo[],
     classes: IClassInfo[],
-    instances: IInstanceInfo[]
+    instances: IInstanceInfo[],
+    methodBodies: IMethodBody[]
   ): IClassInfo {
     const cinitIndex = this.buffer.readEncodedU30();
     const traitCount = this.buffer.readEncodedU30();
     const traits: Trait[] = [];
     for (let i = 0; i < traitCount; i++) {
-      traits.push(this.readTrait(constantPool, methods, classes));
+      traits.push(this.readTrait(constantPool, methods, classes, methodBodies));
     }
     return {
       get instance() {
@@ -509,6 +542,9 @@ export default class AbcFileReader {
       },
       get cinit() {
         return methods[cinitIndex];
+      },
+      get cinitBody() {
+        return methodBodies.find((mb) => mb.methodIndex === cinitIndex)
       },
       traitCount,
       traits
@@ -518,13 +554,14 @@ export default class AbcFileReader {
   private readScript(
     constantPool: IConstantPool,
     methods: IMethodInfo[],
-    classes: IClassInfo[]
+    classes: IClassInfo[],
+    methodBodies: IMethodBody[]
   ): IScriptInfo {
     const initIndex = this.buffer.readEncodedU30();
     const traitCount = this.buffer.readEncodedU30();
     const traits: Trait[] = [];
     for (let i = 0; i < traitCount; i++) {
-      traits.push(this.readTrait(constantPool, methods, classes));
+      traits.push(this.readTrait(constantPool, methods, classes, methodBodies));
     }
     return {
       get init() {
@@ -539,7 +576,8 @@ export default class AbcFileReader {
     classCount: number,
     constantPool: IConstantPool,
     methods: IMethodInfo[],
-    classes: IClassInfo[]
+    classes: IClassInfo[],
+    methodBodies: IMethodBody[]
   ): IInstanceInfo[] {
     const instances: IInstanceInfo[] = [];
     for (let i = 0; i < classCount; i++) {
@@ -564,7 +602,7 @@ export default class AbcFileReader {
       const traitCount = this.buffer.readEncodedU30();
       const traits: Trait[] = [];
       for (let x = 0; x < traitCount; x++) {
-        traits.push(this.readTrait(constantPool, methods, classes));
+        traits.push(this.readTrait(constantPool, methods, classes, methodBodies));
       }
 
       instances.push({
@@ -572,7 +610,7 @@ export default class AbcFileReader {
           return classes[i];
         },
         get name() {
-          return constantPool.multinames[nameIndex];
+          return constantPool.multinames[nameIndex] as IQName;
         },
         get supername() {
           return constantPool.multinames[supernameIndex];
@@ -621,54 +659,53 @@ export default class AbcFileReader {
     methodBodyCount: number,
     methods: IMethodInfo[],
     constantPool: IConstantPool,
-    classes: IClassInfo[]
-  ): IMethodBody[] {
-    const methodBodies: IMethodBody[] = [];
-    for (let i = 0; i < methodBodyCount; i++) {
-      const methodIndex = this.buffer.readEncodedU30();
-      const maxStack = this.buffer.readEncodedU30();
-      const localCount = this.buffer.readEncodedU30();
-      const initScopeDepth = this.buffer.readEncodedU30();
-      const maxScopeDepth = this.buffer.readEncodedU30();
-      const codeLength = this.buffer.readEncodedU30();
-      const startOffset = this.buffer.readOffset;
-      const code: Instruction[] = [];
-      while (this.buffer.readOffset < startOffset + codeLength) {
-        const byteOffset = this.buffer.readOffset - startOffset;
-        code.push(
-          Object.assign(this.readInstruction(constantPool), { byteOffset })
-        );
-      }
-
-      const exceptionCount = this.buffer.readEncodedU30();
-      const exceptions = this.readExceptions(
-        exceptionCount,
-        constantPool.multinames
+    classes: IClassInfo[],
+    methodBodies: IMethodBody[],
+  ): IMethodBody {
+    const methodIndex = this.buffer.readEncodedU30();
+    const maxStack = this.buffer.readEncodedU30();
+    const localCount = this.buffer.readEncodedU30();
+    const initScopeDepth = this.buffer.readEncodedU30();
+    const maxScopeDepth = this.buffer.readEncodedU30();
+    const codeLength = this.buffer.readEncodedU30();
+    const startOffset = this.buffer.readOffset;
+    const code: Instruction[] = [];
+    while (this.buffer.readOffset < startOffset + codeLength) {
+      const byteOffset = this.buffer.readOffset - startOffset;
+      code.push(
+        Object.assign(this.readInstruction(constantPool), { byteOffset })
       );
-      const traitCount = this.buffer.readEncodedU30();
-      const traits: Trait[] = [];
-      for (let y = 0; y < traitCount; y++) {
-        traits.push(this.readTrait(constantPool, methods, classes));
-      }
-
-      methodBodies.push({
-        get method() {
-          return methods[methodIndex];
-        },
-        maxStack,
-        localCount,
-        initScopeDepth,
-        maxScopeDepth,
-        codeLength,
-        code,
-        exceptionCount,
-        exceptions,
-        traitCount,
-        traits
-      });
     }
-    return methodBodies;
+
+    const exceptionCount = this.buffer.readEncodedU30();
+    const exceptions = this.readExceptions(
+      exceptionCount,
+      constantPool.multinames
+    );
+    const traitCount = this.buffer.readEncodedU30();
+    const traits: Trait[] = [];
+    for (let y = 0; y < traitCount; y++) {
+      traits.push(this.readTrait(constantPool, methods, classes, methodBodies));
+    }
+
+    return {
+      get method() {
+        return methods[methodIndex];
+      },
+      methodIndex,
+      maxStack,
+      localCount,
+      initScopeDepth,
+      maxScopeDepth,
+      codeLength,
+      code,
+      exceptionCount,
+      exceptions,
+      traitCount,
+      traits
+    };
   }
+
 
   private readInstruction(constantPool: IConstantPool): Instruction {
     const code: InstructionCode = this.buffer.readUInt8();

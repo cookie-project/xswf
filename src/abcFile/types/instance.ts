@@ -1,6 +1,6 @@
 import { IClassInfo } from "./classes";
 import { IMethodInfo } from "./methods";
-import { MultinameInfo } from "./multiname";
+import { IQName, MultinameInfo } from "./multiname";
 import { INamespaceInfo } from "./namespace";
 import { Trait } from "./trait";
 
@@ -13,7 +13,7 @@ export enum InstanceInfoFlag {
 
 export interface IInstanceInfo {
   class: IClassInfo;
-  name: MultinameInfo;
+  name: IQName;
   supername: MultinameInfo;
   flags: number;
   protectedNs?: INamespaceInfo;

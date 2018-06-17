@@ -40,6 +40,7 @@ export interface IException {
 }
 
 export interface IMethodBody {
+  methodIndex: number;
   method: IMethodInfo;
   maxStack: number;
   localCount: number;

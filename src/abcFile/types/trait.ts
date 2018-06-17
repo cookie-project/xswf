@@ -1,7 +1,7 @@
 import { IClassInfo } from "./classes";
 import { Constant } from "./constant";
-import { IMethodInfo } from "./methods";
-import { MultinameInfo } from "./multiname";
+import { IMethodBody, IMethodInfo } from "./methods";
+import { IQName, MultinameInfo } from "./multiname";
 
 export enum TraitKind {
   Slot = 0,
@@ -20,7 +20,7 @@ export enum TraitAttribute {
 }
 
 export interface ITrait {
-  name: MultinameInfo;
+  name: IQName;
   kind: TraitKind;
   metadataCount?: number;
   metadata?: { key: string; value: string };
@@ -42,12 +42,15 @@ export interface ITraitFunction extends ITrait {
   kind: TraitKind.Function;
   slotId: number;
   func: IMethodInfo;
+  funcBody: IMethodBody;
 }
 
 export interface ITraitMethod extends ITrait {
   kind: TraitKind.Method | TraitKind.Getter | TraitKind.Setter;
+  attribute: TraitAttribute;
   dispId: number;
   method: IMethodInfo;
+  methodBody: IMethodBody;
 }
 
 export type Trait = ITraitSlot | ITraitClass | ITraitMethod | ITraitFunction;
