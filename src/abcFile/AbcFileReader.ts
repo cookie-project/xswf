@@ -58,13 +58,22 @@ export default class AbcFileReader {
     );
     for (let i = 0; i < classCount; i++) {
       classes.push(
-        this.readClass(i, constantPool, methods, classes, instances, methodBodies)
+        this.readClass(
+          i,
+          constantPool,
+          methods,
+          classes,
+          instances,
+          methodBodies
+        )
       );
     }
     const scriptCount = this.buffer.readEncodedU30();
     const scripts: IScriptInfo[] = [];
     for (let i = 0; i < scriptCount; i++) {
-      scripts.push(this.readScript(constantPool, methods, classes, methodBodies));
+      scripts.push(
+        this.readScript(constantPool, methods, classes, methodBodies)
+      );
     }
     const methodBodyCount = this.buffer.readEncodedU30();
     for (let i = 0; i < methodBodyCount; i++) {
@@ -224,8 +233,8 @@ export default class AbcFileReader {
             },
             get names() {
               return params.map(p => multinames[p]);
-            },
-          }
+            }
+          };
           multinames.push(typeName);
           break;
         default:
@@ -479,8 +488,8 @@ export default class AbcFileReader {
             return methods[methodIndex];
           },
           get funcBody() {
-            return methodBodies.find((mb) => mb.methodIndex === methodIndex);
-          },
+            return methodBodies.find(mb => mb.methodIndex === methodIndex);
+          }
         };
         break;
       }
@@ -493,21 +502,21 @@ export default class AbcFileReader {
         if (attrs & 0x1) {
           attribute = TraitAttribute.Final;
         } else if (attrs & 0x2) {
-          attribute = TraitAttribute.Override
+          attribute = TraitAttribute.Override;
         }
         trait = {
+          attribute,
           dispId,
           get name() {
             return constantPool.multinames[nameIndex2] as IQName;
           },
-          attribute,
           kind,
           get method() {
             return methods[methodIndex];
           },
           get methodBody() {
-            return methodBodies.find((mb) => mb.methodIndex === methodIndex);
-          },
+            return methodBodies.find(mb => mb.methodIndex === methodIndex);
+          }
         };
         break;
     }
@@ -544,7 +553,7 @@ export default class AbcFileReader {
         return methods[cinitIndex];
       },
       get cinitBody() {
-        return methodBodies.find((mb) => mb.methodIndex === cinitIndex)
+        return methodBodies.find(mb => mb.methodIndex === cinitIndex);
       },
       traitCount,
       traits
@@ -602,7 +611,9 @@ export default class AbcFileReader {
       const traitCount = this.buffer.readEncodedU30();
       const traits: Trait[] = [];
       for (let x = 0; x < traitCount; x++) {
-        traits.push(this.readTrait(constantPool, methods, classes, methodBodies));
+        traits.push(
+          this.readTrait(constantPool, methods, classes, methodBodies)
+        );
       }
 
       instances.push({
@@ -660,7 +671,7 @@ export default class AbcFileReader {
     methods: IMethodInfo[],
     constantPool: IConstantPool,
     classes: IClassInfo[],
-    methodBodies: IMethodBody[],
+    methodBodies: IMethodBody[]
   ): IMethodBody {
     const methodIndex = this.buffer.readEncodedU30();
     const maxStack = this.buffer.readEncodedU30();
@@ -689,10 +700,10 @@ export default class AbcFileReader {
     }
 
     return {
+      methodIndex,
       get method() {
         return methods[methodIndex];
       },
-      methodIndex,
       maxStack,
       localCount,
       initScopeDepth,
@@ -705,7 +716,6 @@ export default class AbcFileReader {
       traits
     };
   }
-
 
   private readInstruction(constantPool: IConstantPool): Instruction {
     const code: InstructionCode = this.buffer.readUInt8();
