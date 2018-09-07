@@ -26,7 +26,7 @@ import {
   NamespaceKind
 } from "./types/namespace";
 import { IScriptInfo } from "./types/scripts";
-import { ITrait, Trait, TraitAttribute, TraitKind } from "./types/trait";
+import { Trait, TraitAttribute, TraitKind } from "./types/trait";
 /**
  * Spec: https://wwwimages2.adobe.com/content/dam/acom/en/devnet/pdf/avm2overview.pdf
  * Page 18 onwards

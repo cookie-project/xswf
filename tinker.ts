@@ -13,7 +13,7 @@ function log(obj: any) {
   console.log(JSON.stringify(obj, null, 2));
 }
 
-const reader = new SwfReader("./tests/DofusInvoker.swf");
+const reader = new SwfReader("./test/DofusInvoker.swf");
 
 const file = reader.getFile();
 
@@ -94,7 +94,7 @@ const toLog = orderedMessages.map(m => `${m.id}: ${m.name}`);
 
 // log(toLog);
 
-var klass = messageClasses.find(
+const klass = messageClasses.find(
   klass =>
     klass.name.kind === MultinameKind.QName &&
     klass.name.name === "MapComplementaryInformationsDataMessage"

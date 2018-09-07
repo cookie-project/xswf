@@ -24,6 +24,7 @@ export default class SwfReader {
 
   private getHeader(): IHeader {
     this.readPath();
+    // this.buffer.readOffset = 0;
     const signatureString = String.fromCharCode(...[
       this.buffer.readUInt8(), this.buffer.readUInt8(), this.buffer.readUInt8(),
     ]);
@@ -85,7 +86,7 @@ export default class SwfReader {
     }
   }
 
-  private readPath()  {
+  private readPath() {
     this.buffer = SmarterBuffer.fromBuffer(readFileSync(this.path));
   }
 }

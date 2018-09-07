@@ -8,7 +8,7 @@ let reader: SwfReader;
 let file: Types.ISwf;
 
 before(done => {
-  reader = new SwfReader("./tests/DofusInvoker.swf");
+  reader = new SwfReader("./test/DofusInvoker.swf");
   file = reader.getFile();
   done();
 });
@@ -25,7 +25,6 @@ describe("SwfReader", () => {
   it("can getFile() over and over without errors", () => {
     file = reader.getFile();
     file = reader.getFile();
-    file = reader.getFile();
   });
 });
 
@@ -39,7 +38,7 @@ describe("SwfReader - Header", () => {
   });
 
   it("should read the fileLength", () => {
-    expect(file.header.fileLength).equals(20634732);
+    expect(file.header.fileLength).equals(20706566);
   });
 
   it("should read the frameSize", () => {
@@ -67,6 +66,6 @@ describe("SwfReader - Tags", () => {
   it("tags should contains DoABC TAG", () => {
     const tag = file.tags.find(t => t.code === TagCode.DoABC);
     const assert = expect(tag).to.not.be.undefined;
-    expect(tag.length).equals(14958230);
+    expect(tag.length).equals(14782320);
   });
 });

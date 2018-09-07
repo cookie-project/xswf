@@ -1,0 +1,6 @@
+--reporter spec
+--require ts-node/register
+--recursive
+--exit
+--timeout 30000
+test/**/*.spec.ts
